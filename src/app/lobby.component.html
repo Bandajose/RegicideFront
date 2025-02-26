@@ -1,0 +1,69 @@
+<div class="lobby-container">
+  <h2>Salas Disponibles</h2>
+  <ul class="room-list">
+    <li *ngFor="let room of rooms" class="room-item">
+      <span class="room-name">{{ room }}</span>
+      <button class="join-btn" (click)="joinRoom(room)">Unirse</button>
+    </li>
+  </ul>
+
+  <div class="create-room">
+    <h3>Crear Nueva Sala</h3>
+    <input [(ngModel)]="roomName" placeholder="Nombre de la sala">
+    <button class="create-btn" (click)="createRoom()">Crear</button>
+    <p *ngIf="message" class="error-message">{{ message }}</p>
+  </div>
+
+  <div *ngIf="inRoom" class="room-view">
+    <h2>Sala: {{ currentRoom }}</h2>
+    <p *ngIf="gameStarted" class="status started">🎮 Juego en progreso...</p>
+    <p *ngIf="!gameStarted" class="status waiting">⏳ Esperando jugadores...</p>
+
+    <div class="players-section">
+      <h3>Jugadores en la sala</h3>
+      <ul class="players-list">
+        <li *ngFor="let player of players" [class.current-turn]="player === currentTurn">
+          {{ player }}
+          <span *ngIf="player === currentTurn" class="turn-indicator">🔵 Turno actual</span>
+        </li>
+      </ul>
+    </div>
+
+    <button *ngIf="!gameStarted && players.length >= 2" class="start-btn" (click)="startGame()">🚀 Iniciar
+      Partida</button>
+
+    <div *ngIf="gameStarted" class="game-area">
+      <h3>Tu mano</h3>
+      <p><strong>Tu ID:</strong> {{ playerId }}</p>
+      <p><strong>Turno actual:</strong> {{ currentTurn }}</p>
+
+      <div  *ngIf="gameBoard.currentBoss" class="game-area" class="boss-info">
+        <h3>🛡️ Vida del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.health }}</span></h3>
+        <h3>⚔️ Ataque del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.damage }}</span></h3>
+        <p class="boss-effect">⚠️ Efecto del jefe: {{ gameBoard.currentBoss.effects }}</p>
+      </div>
+
+      <ul class="hand">
+        <li *ngFor="let card of hand" class="card">
+          <span>{{ card.value }} {{ card.suit }}</span>
+          <button *ngIf="currentTurn === playerId" class="play-btn"
+            (click)="playCard(card.value, card.suit)">Jugar</button>
+        </li>
+      </ul>
+
+      <p *ngIf="currentTurn === playerId" class="turn-message">✨ Es tu turno</p>
+      <p *ngIf="currentTurn !== playerId" class="waiting-message">⌛ Esperando turno del jugador {{ currentTurn }}</p>
+
+
+      <div *ngIf="gameBoard.currentBoss" class="game-status">
+        <h4>📜 Estado del Juego</h4>
+        <p>🃏 Cartas disponibles en el mazo: {{ gameBoard.deck.length }}</p>
+        <p>☠️ Cartas en el cementerio: {{ gameBoard.grave.length }}</p>
+        <p>⚔️ Cartas usadas contra el jefe:</p>
+        <ul class="used-cards">
+          <li *ngFor="let card of gameBoard.table">{{ card.value }} {{ card.suit }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,214 @@
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes blink {
+  0% { background-color: #d1ecf1; }
+  50% { background-color: #b2ebf2; }
+  100% { background-color: #d1ecf1; }
+}
+
+.lobby-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+h2, h3 {
+  color: #333;
+}
+
+.room-list {
+  list-style: none;
+  padding: 0;
+}
+
+.room-item {
+  background: #f9f9f9;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.room-name {
+  font-weight: bold;
+  color: #333;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.join-btn, .create-btn, .start-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+}
+
+.join-btn:hover, .create-btn:hover, .start-btn:hover {
+  background: #0056b3;
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+.room-view {
+  margin-top: 20px;
+  padding: 15px;
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status.started {
+  background: #4CAF50;
+  color: white;
+}
+
+.status.waiting {
+  background: #FFC107;
+  color: white;
+}
+
+.players-list {
+  list-style: none;
+  padding: 0;
+}
+
+.players-list li {
+  padding: 8px;
+  background: white;
+  border-radius: 5px;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.players-list .current-turn {
+  background: #d1ecf1;
+  border-left: 4px solid #17a2b8;
+  animation: blink 1.5s infinite alternate;
+}
+
+.turn-indicator {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.hand {
+  list-style: none;
+  padding: 0;
+}
+
+.card {
+  background: white;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.7s ease-in-out;
+}
+
+.play-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+}
+
+.play-btn:hover {
+  background: #218838;
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+.turn-message {
+  color: #28a745;
+  font-weight: bold;
+  animation: pulse 1s infinite alternate;
+}
+
+.waiting-message {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.boss-info {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffecec;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.boss-health {
+  font-size: 22px;
+  font-weight: bold;
+  color: #d9534f;
+}
+
+.boss-effect {
+  font-style: italic;
+  font-size: 16px;
+  color: #c9302c;
+}
+
+.game-status {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.used-cards {
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+
+.used-cards li {
+  background: white;
+  padding: 5px;
+  margin: 3px 0;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
