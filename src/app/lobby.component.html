@@ -37,24 +37,6 @@
       <p><strong>Tu ID:</strong> {{ playerId }}</p>
       <p><strong>Turno actual:</strong> {{ currentTurn }}</p>
 
-      <div  *ngIf="gameBoard.currentBoss" class="game-area" class="boss-info">
-        <h3>🛡️ Vida del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.health }}</span></h3>
-        <h3>⚔️ Ataque del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.damage }}</span></h3>
-        <p class="boss-effect">⚠️ Efecto del jefe: {{ gameBoard.currentBoss.effects }}</p>
-      </div>
-
-      <ul class="hand">
-        <li *ngFor="let card of hand" class="card">
-          <span>{{ card.value }} {{ card.suit }}</span>
-          <button *ngIf="currentTurn === playerId" class="play-btn"
-            (click)="playCard(card.value, card.suit)">Jugar</button>
-        </li>
-      </ul>
-
-      <p *ngIf="currentTurn === playerId" class="turn-message">✨ Es tu turno</p>
-      <p *ngIf="currentTurn !== playerId" class="waiting-message">⌛ Esperando turno del jugador {{ currentTurn }}</p>
-
-
       <div *ngIf="gameBoard.currentBoss" class="game-status">
         <h4>📜 Estado del Juego</h4>
         <p>🃏 Cartas disponibles en el mazo: {{ gameBoard.deck.length }}</p>
@@ -64,6 +46,34 @@
           <li *ngFor="let card of gameBoard.table">{{ card.value }} {{ card.suit }}</li>
         </ul>
       </div>
+
+      <div *ngIf="gameBoard.currentBoss" class="boss-info">
+        <h3>🛡️ Vida del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.health }}</span></h3>
+        <h3>⚔️ Ataque del Jefe: <span class="boss-health">{{ gameBoard.currentBoss.damage }}</span></h3>
+        <p class="boss-effect">⚠️ Efecto del jefe: {{ gameBoard.currentBoss.effects }}</p>
+      </div>
+
+      <ul class="hand">
+        <li *ngFor="let card of hand" class="card" (click)="toggleCardSelection(card)"
+          [class.selected]="selectedCards.includes(card)">
+          <span>{{ card.value }} {{ card.suit }}</span>
+        </li>
+      </ul>
+
+      <div class="action-buttons">
+        <button *ngIf="currentTurn === playerId" class="attack-btn" (click)="attack()"
+          [disabled]="selectedCards.length === 0">
+          ⚔️ Atacar
+        </button>
+        <button *ngIf="currentTurn === playerId" class="defend-btn" (click)="defend()"
+          [disabled]="selectedCards.length === 0">
+          🛡️ Defender
+        </button>
+      </div>
+
+      <p *ngIf="currentTurn === playerId" class="turn-message">✨ Es tu turno</p>
+      <p *ngIf="currentTurn !== playerId" class="waiting-message">⌛ Esperando turno del jugador {{ currentTurn }}</p>
+
     </div>
   </div>
 </div>

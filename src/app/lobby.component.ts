@@ -27,6 +27,7 @@ export class LobbyComponent implements OnInit {
   hand: any[] = [];
   effectMessage: string = '';
   gameBoard: any = {};
+  selectedCards: any[] = [];
 
   constructor(private socketService: SocketService, private cdr: ChangeDetectorRef) { }
 
@@ -85,12 +86,40 @@ export class LobbyComponent implements OnInit {
     }
   }
 
-  playCard(value: string, suit: string) {
-    if (this.currentTurn === this.playerId) {
-      console.log("🎴 Jugando carta:", value + suit, "Jugador:", this.playerId); // 🔍 Debug
-      console.log("🆔 Request playTurn", this.currentRoom, this.playerId, value, suit); // 🔍 Debug
-      this.socketService.playTurn(this.currentRoom, this.playerId, value, suit);
-      // this.hand = this.hand.filter(card => !(card.value === value && card.suit === suit));
+  toggleCardSelection(card: any) {
+    const index = this.selectedCards.findIndex(c => c.value === card.value && c.suit === card.suit);
+    if (index > -1) {
+      this.selectedCards.splice(index, 1); // Deseleccionar si ya estaba seleccionada
+    } else {
+      this.selectedCards.push(card); // Seleccionar si no estaba en la lista
+    }
+    console.log("🃏 Cartas seleccionadas:", this.selectedCards); // 🔍 Debug
+  }
+
+  attack() {
+    if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
+
+      const action = "1";
+      console.log("⚔️ Atacando con cartas:", this.selectedCards, "Jugador:", this.playerId); // 🔍 Debug
+
+
+      this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
+
+      // this.socketService.attack(this.currentRoom, this.playerId, this.selectedCards);
+
+      // Limpiar selección tras jugar
+      this.selectedCards = [];
+    }
+  }
+
+  defend() {
+    if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
+      const action = "1";
+
+      console.log("⚔️ Defendiendo con cartas:", this.selectedCards, "Jugador:", this.playerId); // 🔍 Debug
+      // this.socketService.defend(this.currentRoom, this.playerId);
+
+      this.selectedCards = [];
     }
   }
 }
