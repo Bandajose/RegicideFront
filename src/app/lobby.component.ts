@@ -100,8 +100,57 @@ export class LobbyComponent implements OnInit {
     console.log("🃏 Cartas seleccionadas:", this.selectedCards);
   }
 
+  // Método para validar si se puede atacar
+  canAttack(): boolean {
+    if (this.selectedCards.length === 1) {
+      return true; // Si hay una carta seleccionada, se puede atacar
+    }
+
+    if (this.selectedCards.length === 2) {
+      const card1 = this.selectedCards[0];
+      const card2 = this.selectedCards[1];
+
+      // Verificar si alguna carta es 'A' o si las cartas son pares con suma <= 10
+      const isPair = card1.value === card2.value;
+      const isAce = card1.value === 'A' || card2.value === 'A';
+      const isSumValid = (isPair || isAce) || (parseInt(card1.value) + parseInt(card2.value) <= 10);
+
+      // Verificar que no haya más de un Joker
+      const hasJoker = this.selectedCards.some(card => card.value === 'Joker');
+      return isSumValid && !hasJoker;
+    }
+
+    return false; // Si hay más de 2 cartas seleccionadas, no se puede atacar
+  }
+
+  // Método para validar si se puede defender
+  canDefend(): boolean {
+    // let defenseExceeded = false;
+    // let sum = 0;
+
+    // for (const card of this.selectedCards) {
+
+    //   // Verificar que no haya Jokers y sumar los valores
+    //   if (card.value === 'Joker') continue;
+
+    //   //Si la suma ya supera el daño del jefe agregar en true
+    //   if (sum > this.gameBoard.currentBoss.damage) defenseExceeded = true;
+
+    //   //Poner un valor a las cartas
+    //   if (card.value === 'A') sum += 1;
+    //   else if (card.value === 'J') sum += 10;
+    //   else if (card.value === 'Q') sum += 15;
+    //   else if (card.value === 'K') sum += 20;
+    //   else sum += parseInt(card.value);
+
+    // }
+
+    // Verificar que la suma no supere el daño del jefe
+    return /*!defenseExceeded  && */ !this.selectedCards.some(card => card.value === 'Joker');
+  }
+
   attack() {
-    if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
+    if (this.currentTurn === this.playerId && this.selectedCards.length > 0 && this.canAttack()) {
       const action = "attack";
       console.log("⚔️ Atacando con cartas:", this.selectedCards, "Jugador:", this.playerId);
       this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
@@ -110,9 +159,9 @@ export class LobbyComponent implements OnInit {
   }
 
   defend() {
-    if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
+    if (this.currentTurn === this.playerId && this.canDefend()) {
       const action = "defend";
-      console.log("⚔️ Defendiendo con cartas:", this.selectedCards, "Jugador:", this.playerId);
+      console.log("🛡️ Defendiendo con cartas:", this.selectedCards, "Jugador:", this.playerId);
       this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
       this.selectedCards = [];
     }
