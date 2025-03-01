@@ -91,69 +91,17 @@ export class LobbyComponent implements OnInit {
 
   toggleCardSelection(card: any) {
     const index = this.selectedCards.findIndex(c => c.value === card.value && c.suit === card.suit);
-
-
-    if (this.playerPhase === "attack") {
-
-      if (index > -1) {
-        this.selectedCards.splice(index, 1);
-      } else {
-        if (this.selectedCards.length < 2) {
-          this.selectedCards.push(card);
-        }
-      }
-
-      if (this.selectedCards.length === 2) {
-        const [card1, card2] = this.selectedCards;
-        const isValidSelection = this.validateCardSelection(card1, card2);
-
-        if (!isValidSelection) {
-          this.selectedCards.pop();
-        }
-      }
-    }
-    else {
-      if (index > -1) {
-        this.selectedCards.splice(index, 1);
-      } else {
-        this.selectedCards.push(card);
-      }
+    if (index > -1) {
+      this.selectedCards.splice(index, 1);
+    } else {
+      this.selectedCards.push(card);
     }
 
     console.log("🃏 Cartas seleccionadas:", this.selectedCards);
   }
 
-  validateCardSelection(card1: any, card2: any): boolean {
-    const values = [card1.value, card2.value];
-    const points = values.map(v => (v === 'A' ? 1 : parseInt(v, 10)));
-    const sum = points.reduce((a, b) => a + b, 0);
-
-    if (values.includes('A')) {
-      return true;
-    }
-
-    if (card1.value !== card2.value) {
-      return false;
-    }
-
-    return sum <= 10;
-  }
-
   attack() {
     if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
-      if (this.selectedCards.length > 2) {
-        console.log("⚠️ Solo puedes seleccionar hasta 2 cartas.");
-        return;
-      }
-
-      if (this.selectedCards.length === 2) {
-        const [card1, card2] = this.selectedCards;
-        if (!this.validateCardSelection(card1, card2)) {
-          console.log("⚠️ Selección inválida. Verifica las reglas de ataque.");
-          return;
-        }
-      }
-
       const action = "attack";
       console.log("⚔️ Atacando con cartas:", this.selectedCards, "Jugador:", this.playerId);
       this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
@@ -186,8 +134,6 @@ export class LobbyComponent implements OnInit {
     this.hand = [];
     this.selectedCards = [];
     this.gameBoard = {};
-    // this.endGame = true;
-    // this.winGame = false;
     console.log("🛑 La partida ha finalizado.");
   }
 }
