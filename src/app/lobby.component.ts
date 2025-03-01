@@ -28,6 +28,7 @@ export class LobbyComponent implements OnInit {
   effectMessage: string = '';
   gameBoard: any = {};
   selectedCards: any[] = [];
+  playerPhase: string = '';
 
   constructor(private socketService: SocketService, private cdr: ChangeDetectorRef) { }
 
@@ -47,6 +48,7 @@ export class LobbyComponent implements OnInit {
       this.gameBoard = data
       this.gameStarted = true;
       this.currentTurn = data.playerTurn;
+      this.playerPhase = data.playerPhase;
       // this.effectMessage = data.effectMessage;
       console.log("getboardStatus:", this.gameBoard); // 🔍 Debug
     });
@@ -99,26 +101,18 @@ export class LobbyComponent implements OnInit {
   attack() {
     if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
 
-      const action = "1";
+      const action = "attack";
       console.log("⚔️ Atacando con cartas:", this.selectedCards, "Jugador:", this.playerId); // 🔍 Debug
-
-
       this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
-
-      // this.socketService.attack(this.currentRoom, this.playerId, this.selectedCards);
-
-      // Limpiar selección tras jugar
       this.selectedCards = [];
     }
   }
 
   defend() {
     if (this.currentTurn === this.playerId && this.selectedCards.length > 0) {
-      const action = "1";
-
+      const action = "defend";
       console.log("⚔️ Defendiendo con cartas:", this.selectedCards, "Jugador:", this.playerId); // 🔍 Debug
-      // this.socketService.defend(this.currentRoom, this.playerId);
-
+      this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
       this.selectedCards = [];
     }
   }

@@ -61,7 +61,7 @@
       </ul>
 
       <div class="action-buttons">
-        <button *ngIf="currentTurn === playerId" class="attack-btn" (click)="attack()"
+        <button *ngIf="currentTurn === playerId && playerPhase === 'attack'" class="attack-btn" (click)="attack()"
           [disabled]="selectedCards.length === 0">
           ⚔️ Atacar
         </button>
