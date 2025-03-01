@@ -146,7 +146,7 @@ export class LobbyComponent implements OnInit {
     // }
 
     // Verificar que la suma no supere el daño del jefe
-    return /*!defenseExceeded  && */ !this.selectedCards.some(card => card.value === 'Joker');
+    return /*!defenseExceeded  && */ !this.selectedCards.some(card => card.suit === 'Joker');
   }
 
   attack() {
