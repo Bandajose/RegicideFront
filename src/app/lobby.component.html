@@ -14,6 +14,11 @@
     <p *ngIf="message" class="error-message">{{ message }}</p>
   </div>
 
+  <div *ngIf="endGame" class="game-result">
+    <h2>{{ gameResultMessage }}</h2>
+    <button class="restart-btn" (click)="terminateGame()">🔄 Volver al lobby</button>
+  </div>
+
   <div *ngIf="inRoom" class="room-view">
     <h2>Sala: {{ currentRoom }}</h2>
     <p *ngIf="gameStarted" class="status started">🎮 Juego en progreso...</p>

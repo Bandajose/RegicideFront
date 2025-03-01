@@ -29,6 +29,7 @@ export class LobbyComponent implements OnInit {
   playerPhase: string = '';
   endGame: boolean = false;
   winGame: boolean = false;
+  gameResultMessage: string = '';
 
   constructor(private socketService: SocketService, private cdr: ChangeDetectorRef) { }
 
@@ -52,6 +53,8 @@ export class LobbyComponent implements OnInit {
       this.endGame = data.endGame;
       this.winGame = data.winGame;
       console.log("getboardStatus:", this.gameBoard);
+
+      this.checkGameStatus();
     });
 
     this.socketService.getRooms();
@@ -88,22 +91,35 @@ export class LobbyComponent implements OnInit {
 
   toggleCardSelection(card: any) {
     const index = this.selectedCards.findIndex(c => c.value === card.value && c.suit === card.suit);
-    if (index > -1) {
-      this.selectedCards.splice(index, 1);
-    } else {
-      if (this.selectedCards.length < 2) {
+
+
+    if (this.playerPhase === "attack") {
+
+      if (index > -1) {
+        this.selectedCards.splice(index, 1);
+      } else {
+        if (this.selectedCards.length < 2) {
+          this.selectedCards.push(card);
+        }
+      }
+
+      if (this.selectedCards.length === 2) {
+        const [card1, card2] = this.selectedCards;
+        const isValidSelection = this.validateCardSelection(card1, card2);
+
+        if (!isValidSelection) {
+          this.selectedCards.pop();
+        }
+      }
+    }
+    else {
+      if (index > -1) {
+        this.selectedCards.splice(index, 1);
+      } else {
         this.selectedCards.push(card);
       }
     }
 
-    if (this.selectedCards.length === 2) {
-      const [card1, card2] = this.selectedCards;
-      const isValidSelection = this.validateCardSelection(card1, card2);
-
-      if (!isValidSelection) {
-        this.selectedCards.pop();
-      }
-    }
     console.log("🃏 Cartas seleccionadas:", this.selectedCards);
   }
 
@@ -152,5 +168,26 @@ export class LobbyComponent implements OnInit {
       this.socketService.playTurn(this.currentRoom, this.playerId, action, this.selectedCards);
       this.selectedCards = [];
     }
+  }
+
+  checkGameStatus() {
+    if (this.endGame) {
+      this.gameResultMessage = this.winGame ? "🎉 ¡Has ganado la partida!" : "😞 Has perdido la partida.";
+      console.log(this.gameResultMessage);
+      this.terminateGame();
+    }
+  }
+
+  terminateGame() {
+    this.gameStarted = false;
+    this.inRoom = false;
+    this.currentRoom = '';
+    this.players = [];
+    this.hand = [];
+    this.selectedCards = [];
+    this.gameBoard = {};
+    // this.endGame = true;
+    // this.winGame = false;
+    console.log("🛑 La partida ha finalizado.");
   }
 }
