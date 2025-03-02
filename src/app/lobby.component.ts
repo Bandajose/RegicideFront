@@ -86,11 +86,11 @@ export class LobbyComponent implements OnInit {
     this.socketService.createRoom(this.roomName);
   }
 
-  joinRoom() {
-    if (!this.roomName.trim()) return;
-    this.socketService.joinRoom(this.roomName);
+  joinRoom(roomName: string) {
+    if (!roomName.trim()) return;
+    this.socketService.joinRoom(roomName);
   }
-
+  
   startGame() {
     if (this.players.length >= 2) {
       this.socketService.startGame(this.currentRoom);
