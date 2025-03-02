@@ -46,26 +46,18 @@ export class SocketService {
     this.socket.emit('createRoom', roomName);
   }
 
-  createRoomResponse(): Observable<any> {
+  roomResponse(): Observable<any> {
     return new Observable(observer => {
-      this.socket.on('createRoomResponse', (response: any) => {
-        console.log("📥 Evento recibido: createRoomResponse", response); // 🔍 Debug
+      this.socket.on('roomResponse', (response: any) => {
+        console.log("📥 Evento recibido: roomResponse", response); // 🔍 Debug
         observer.next(response);
       });
     });
   }
 
-  joinRoom(room: string): Observable<any> {
-
-    console.log("📥 Evento recibido: joinRoom"); // 🔍 Debug
-
-    return new Observable(observer => {
-      this.socket.emit('joinRoom', room, (response: any) => {
-        observer.next(response);
-        console.log("📥 Evento recibido: joinRoom", response); // 🔍 Debug
-
-      });
-    });
+  joinRoom(roomName: string) {
+    console.log("📥 Evento recibido: joinRoom",roomName); // 🔍 Debug
+    this.socket.emit('joinRoom', roomName);
   }
 
   startGame(room: string) {

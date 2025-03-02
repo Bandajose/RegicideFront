@@ -45,10 +45,24 @@ export class LobbyComponent implements OnInit {
       console.log("🃏 Cartas recibidas en el frontend:", this.hand);
     });
 
-    this.socketService.createRoomResponse().subscribe(response => {
+    this.socketService.roomResponse().subscribe(response => {
       this.message = response.message;
+
       if (response.success) {
-        this.roomName = '';
+
+        if (response.roomName) {
+          this.inRoom = true;
+          this.currentRoom = response.roomName;
+          this.playerId = response.playerId;
+          console.log("🆔 ID del jugador asignado:", this.playerId);
+        }
+        else {
+          this.roomName = '';
+        }
+
+
+      } else {
+        this.message = response.message;
       }
     });
 
@@ -72,17 +86,9 @@ export class LobbyComponent implements OnInit {
     this.socketService.createRoom(this.roomName);
   }
 
-  joinRoom(room: string) {
-    this.socketService.joinRoom(room).subscribe(response => {
-      if (response.success) {
-        this.inRoom = true;
-        this.currentRoom = room;
-        this.playerId = response.playerId;
-        console.log("🆔 ID del jugador asignado:", this.playerId);
-      } else {
-        this.message = response.message;
-      }
-    });
+  joinRoom() {
+    if (!this.roomName.trim()) return;
+    this.socketService.joinRoom(this.roomName);
   }
 
   startGame() {
