@@ -65,7 +65,7 @@ export class SocketService {
   }
 
   playTurn(room: string, playerId: string, action: string, cards: any[]) {
-    this.socket.emit('playTurn', room, playerId, action, cards);
+    this.socket.emit('playTurn', {roomName:room, playerId:playerId, action:action, cards:cards});
   }
 
   getboardStatus(): Observable<any> {
