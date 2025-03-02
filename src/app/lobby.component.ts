@@ -45,6 +45,13 @@ export class LobbyComponent implements OnInit {
       console.log("🃏 Cartas recibidas en el frontend:", this.hand);
     });
 
+    this.socketService.createRoomResponse().subscribe(response => {
+      this.message = response.message;
+      if (response.success) {
+        this.roomName = '';
+      }
+    });
+
     this.socketService.getboardStatus().subscribe(data => {
       this.gameBoard = data;
       this.gameStarted = true;
@@ -62,12 +69,7 @@ export class LobbyComponent implements OnInit {
 
   createRoom() {
     if (!this.roomName.trim()) return;
-    this.socketService.createRoom(this.roomName).subscribe(response => {
-      this.message = response.message;
-      if (response.success) {
-        this.roomName = '';
-      }
-    });
+    this.socketService.createRoom(this.roomName);
   }
 
   joinRoom(room: string) {

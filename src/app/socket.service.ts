@@ -41,10 +41,15 @@ export class SocketService {
     });
   }
   
-  createRoom(roomName: string): Observable<any> {
+  createRoom(roomName: string) {
+    console.log("📥 Evento recibido: createRoom",roomName); // 🔍 Debug
+    this.socket.emit('createRoom', roomName);
+  }
+
+  createRoomResponse(): Observable<any> {
     return new Observable(observer => {
-      console.log("📥 Evento recibido: createRoom"); // 🔍 Debug
-      this.socket.emit('createRoom', roomName, (response: any) => {
+      this.socket.on('createRoomResponse', (response: any) => {
+        console.log("📥 Evento recibido: createRoomResponse", response); // 🔍 Debug
         observer.next(response);
       });
     });
