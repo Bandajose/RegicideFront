@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocketService } from './socket.service';
+import { SocketService } from '../services/socket.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
@@ -13,7 +13,7 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 
 export class LobbyComponent implements OnInit {
-  rooms: string[] = [];
+  rooms: any[] = [];
   roomName: string = '';
   message: string = '';
   players: string[] = [];
@@ -34,9 +34,16 @@ export class LobbyComponent implements OnInit {
   constructor(private socketService: SocketService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.socketService.getRooms().subscribe(rooms => {
-      this.rooms = rooms;
-    });
+
+    // this.socketService.getRooms().subscribe(rooms => {
+    //   this.rooms = rooms;
+    //   console.log("📥 Salas recibidas:", rooms);
+      
+    //   //
+    //   //
+    //   //
+    // });
+
 
     this.socketService.getPlayers().subscribe(players => this.players = players);
 
@@ -78,13 +85,13 @@ export class LobbyComponent implements OnInit {
       this.checkGameStatus();
     });
 
-    this.socketService.getRooms();
+    // this.socketService.getRooms();
   }
 
-  createRoom() {
-    if (!this.roomName.trim()) return;
-    this.socketService.createRoom(this.roomName);
-  }
+  // createRoom() {
+  //   if (!this.roomName.trim()) return;
+  //   // this.socketService.createRoom(this.roomName);
+  // }
 
   joinRoom(roomName: string) {
     if (!roomName.trim()) return;

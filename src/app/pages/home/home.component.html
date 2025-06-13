@@ -1,0 +1,71 @@
+<div class="home"> 
+    <div class="container-wrapper">
+        <div class="container left-container">
+            <h2>Sala</h2>
+            <div class="input-container">
+                <input type="text" [(ngModel)]="roomName" placeholder="Ingresar ID de la sala">
+                <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+            </div>
+        
+            <div class="button-container">
+                <button style="background: #007bff;">🔍 Buscar</button>
+            </div>
+            
+            <div class="button-container">
+                <button (click)="joinRoom()" [disabled]="loading">
+                    <span *ngIf="!loading">🔑 Unirse</span>
+                    <div *ngIf="loading" class="loading"></div>
+                </button>
+            </div> 
+
+            <div class="button-container">
+                <button style="background: #007bff;" (click)="createRoom()">➕ Crear Sala</button>
+            </div>
+        </div>
+        
+        <div class="container right-container">
+            <h2>📋 Salas Disponibles</h2>
+            <ul class="room-list">
+                <li *ngFor="let room of rooms" (click)="joinRoomByName(room.name)">
+                    🎮 <span style="flex:1;">{{ room.name }}</span>
+                    👥 {{ room.players }}/{{ room.maxPlayers }}
+                </li>
+
+                <!-- <li>
+                    🎮 <span style="flex:1;">Sala Ejmplo 1</span>
+                    👥 3/5
+                </li>
+
+                <li>
+                    🎮 <span style="flex:1;">Sala Ejmplo 2</span>
+                    👥 3/5
+                </li>
+
+                <li>
+                    🎮 <span style="flex:1;">Sala Ejmplo 3</span>
+                    👥 3/5
+                </li>
+                <li>
+                    🎮 <span style="flex:1;">Sala Ejmplo 4</span>
+                    👥 3/5
+                </li>
+                <li>
+                    🎮 <span style="flex:1;">Sala Ejmplo 5</span>
+                    👥 3/5
+                </li> -->
+            </ul>
+
+            <!-- <div class="pagination">
+                <button (click)="prevPage()" [disabled]="currentPage === 1">◀</button>
+                <span>Página {{ currentPage }} de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages">▶</button>
+            </div> -->
+
+            <div class="pagination" *ngIf="rooms.length > 0">
+                <button>◀</button>
+                <span>Página {{ 1 }} de {{ 10 }}</span>
+                <button>▶</button>
+            </div>
+        </div>
+    </div>
+</div>
