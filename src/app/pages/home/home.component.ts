@@ -4,6 +4,7 @@ import { SocketService } from '../../../services/socket.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CreateRoomRequest } from '../../Data/CreateRoomRequest';
+import { RoomResponse } from '../../Data/RoomResponse';
 
 @Component({
   selector: 'app-home',
@@ -13,10 +14,17 @@ import { CreateRoomRequest } from '../../Data/CreateRoomRequest';
 })
 export class HomeComponent implements OnInit {
 
-  rooms: any[] = [];
+  dataRooms: RoomResponse = {
+    rooms: [],
+    totalRooms: '0',
+    totalPages: '0',
+    currentPage: '1'
+  };
+  
   errorMessage: string = '';
   loading: boolean = false;
   roomName: string = '';
+
 
   constructor(private socketService: SocketService) { }
 
@@ -26,8 +34,11 @@ export class HomeComponent implements OnInit {
     this.socketService.getRooms({ page: '1', size: '5' });
 
     //Escuchar por cambios en las salas
-    this.socketService.updateRooms().subscribe(rooms => {
-      console.log("📥 Salas recibidas:", rooms);
+    this.socketService.updateRooms().subscribe(roomsResponse => {
+      console.log("📥 Salas recibidas:", roomsResponse);
+      this.dataRooms = roomsResponse;
+      console.log("📥 Salas recibidas: this.rooms ", this.dataRooms);
+
     });
   }
 
@@ -62,15 +73,19 @@ export class HomeComponent implements OnInit {
 
     this.socketService.createRoom(roomRequest).subscribe(response => {
       // this.message = response.message;
-      // if (response.success) {
-      //   this.roomName = '';
-      // }
+      if (response.success) {
+        //entrar a la sala creada
+      }
+      else
+      {
+        this.errorMessage = response.message || 'Error al crear la sala';
+        console.error('Error al crear la sala:', this.errorMessage);
+      }
     });
-  
-    // this.socketService.createRoom(roomRequest);
+
   }
 
-  get filteredRooms() {
-    return this.rooms.filter(room => room.name.toLowerCase().includes(this.roomName.toLowerCase()));
-  }
+  // get filteredRooms() {
+  //   return this.rooms.filter(room => room.roomName.toLowerCase().includes(this.roomName.toLowerCase()));
+  // }
 }

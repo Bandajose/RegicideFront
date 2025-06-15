@@ -169,6 +169,7 @@ button:disabled {
     font-size: 14px;
     display: none;
     margin-top: 5px;
+    display: block;
 }
 
 #joinButton {
@@ -202,3 +203,4 @@ button:disabled {
     background: gray;
     cursor: not-allowed;
 }
+

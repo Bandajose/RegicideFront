@@ -26,46 +26,29 @@
         <div class="container right-container">
             <h2>📋 Salas Disponibles</h2>
             <ul class="room-list">
-                <li *ngFor="let room of rooms" (click)="joinRoomByName(room.name)">
-                    🎮 <span style="flex:1;">{{ room.name }}</span>
-                    👥 {{ room.players }}/{{ room.maxPlayers }}
+                <li *ngFor="let room of dataRooms.rooms" (click)="joinRoomByName(room.roomName)">
+                    🎮 <span style="flex:1;">{{ room.roomName }}</span>
+                    👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}
                 </li>
-
-                <!-- <li>
-                    🎮 <span style="flex:1;">Sala Ejmplo 1</span>
-                    👥 3/5
-                </li>
-
-                <li>
-                    🎮 <span style="flex:1;">Sala Ejmplo 2</span>
-                    👥 3/5
-                </li>
-
-                <li>
-                    🎮 <span style="flex:1;">Sala Ejmplo 3</span>
-                    👥 3/5
-                </li>
-                <li>
-                    🎮 <span style="flex:1;">Sala Ejmplo 4</span>
-                    👥 3/5
-                </li>
-                <li>
-                    🎮 <span style="flex:1;">Sala Ejmplo 5</span>
-                    👥 3/5
-                </li> -->
             </ul>
 
+            <div class="pagination">
+                <button [disabled]="dataRooms.currentPage === '1'">◀</button>
+                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
+                <button [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
+            </div>
+
             <!-- <div class="pagination">
-                <button (click)="prevPage()" [disabled]="currentPage === 1">◀</button>
-                <span>Página {{ currentPage }} de {{ totalPages }}</span>
-                <button (click)="nextPage()" [disabled]="currentPage === totalPages">▶</button>
+                <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
+                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
             </div> -->
 
-            <div class="pagination" *ngIf="rooms.length > 0">
+            <!-- <div class="pagination" *ngIf="dataRooms.roomList.length > 0">
                 <button>◀</button>
-                <span>Página {{ 1 }} de {{ 10 }}</span>
+                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
                 <button>▶</button>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

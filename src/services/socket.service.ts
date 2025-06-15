@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { Pagination } from '../app/Data/Pagination';
 import { CreateRoomRequest } from '../app/Data/CreateRoomRequest';
+import { RoomResponse } from '../app/Data/RoomResponse';
 
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +11,7 @@ export class SocketService {
   private socket: Socket;
 
   constructor() {
-    this.socket = io('http://54.224.109.230:8080/'); // dev
+    this.socket = io('http://18.212.73.226:8080/'); // dev
     // this.socket = io('https://two1gamebackend.onrender.com'); //prod
   }
 
@@ -20,9 +21,9 @@ export class SocketService {
   }
 
 
-  updateRooms(): Observable<any[]> {
+  updateRooms(): Observable<RoomResponse> {
     return new Observable(observer => {
-      this.socket.on('updateRooms', (rooms: any[]) => {
+      this.socket.on('updateRooms', (rooms: RoomResponse) => {
         // console.log("📥 Evento recibido: updateRooms", rooms); // 🔍 Debug
         observer.next(rooms);
       });
