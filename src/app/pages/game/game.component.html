@@ -1,96 +1,157 @@
-<div class="game" *ngIf="board; else loading">
+<div class="game-container" *ngIf="board; else loadingTpl">
 
-  <!-- End Game Overlay -->
+  <!-- ── OVERLAY FIN DE PARTIDA ── -->
   <div class="overlay" *ngIf="board.endGame">
     <div class="overlay-box">
       <h1>{{ board.winGame ? '🏆 ¡Ganaron!' : '💀 Han perdido' }}</h1>
-      <p *ngIf="board.winGame">Derrotaron a todos los jefes.</p>
-      <p *ngIf="!board.winGame">El jefe hizo demasiado daño.</p>
+      <p>{{ board.winGame ? 'Derrotaron a todos los jefes.' : 'El jefe hizo demasiado daño.' }}</p>
       <button (click)="leaveGame()">Volver al Inicio</button>
     </div>
   </div>
 
-  <!-- Header -->
-  <div class="game-header">
-    <div class="turn-indicator" [class.my-turn]="isMyTurn">
-      <span *ngIf="isMyTurn">⚔️ Tu turno — Fase: <strong>{{ board.playerPhase }}</strong></span>
-      <span *ngIf="!isMyTurn">⏳ Turno de otro jugador</span>
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+    <div class="panel">🏰 {{ roomName }}</div>
+
+    <div class="player-list">
+      <div class="player" *ngFor="let p of board.players" [class.active-turn]="p.id === board.playerTurn">
+        <div class="player-avatar">{{ p.id === playerId ? '👤' : '🎮' }}</div>
+        <div class="player-info">
+          <span class="player-name">{{ p.id === playerId ? 'Tú' : shortId(p.id) }}</span>
+          <span class="player-cards">🃏 {{ p.cardCount }} cartas</span>
+        </div>
+        <span class="turn-dot" *ngIf="p.id === board.playerTurn">●</span>
+      </div>
     </div>
-    <button class="btn-leave" (click)="leaveGame()">🚪 Salir</button>
+
+    <div class="sidebar-stats">
+      <div class="stat-row">🃏 Mazo <strong>{{ board.deck.length }}</strong></div>
+      <div class="stat-row">🗑️ Cementerio <strong>{{ board.grave.length }}</strong></div>
+      <div class="stat-row">👑 Jefes rest. <strong>{{ board.bosses.length }}</strong></div>
+    </div>
+
+    <button class="btn btn-leave" (click)="leaveGame()">🚪 Salir</button>
   </div>
 
-  <div class="game-body">
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
 
-    <!-- Boss + Stats -->
-    <div class="top-row">
-      <div class="boss-card" [class.red]="isRed(board.currentBoss.suit)">
-        <div class="boss-title">Jefe Actual</div>
-        <div class="boss-face">{{ board.currentBoss.value }}{{ board.currentBoss.suit }}</div>
+    <!-- 1) Banner de turno -->
+    <div class="turn-banner" [class.my-turn]="isMyTurn">
+      <ng-container *ngIf="isMyTurn">
+        ⚔️ Tu turno —
+        <strong>{{ board.playerPhase === 'attack' ? 'Selecciona cartas para atacar' : 'Selecciona cartas para defender' }}</strong>
+      </ng-container>
+      <ng-container *ngIf="!isMyTurn">
+        ⏳ Turno de <strong>{{ shortId(board.playerTurn) }}</strong>
+      </ng-container>
+    </div>
+
+    <!-- 2) Zona central: cementerio | JEFE | mazo -->
+    <div class="center-zone">
+
+      <!-- Cementerio -->
+      <div class="pile-zone">
+        <div class="pile-stack" *ngIf="board.grave.length > 0; else emptyPile">
+          <div class="card card-back grave-back p-back"></div>
+          <div class="card card-back grave-back p-mid"></div>
+          <div class="card card-back grave-back p-front"></div>
+        </div>
+        <ng-template #emptyPile><div class="pile-empty">—</div></ng-template>
+        <span class="pile-label">Cementerio<br><strong>{{ board.grave.length }}</strong></span>
+      </div>
+
+      <!-- Jefe -->
+      <div class="boss-zone" [class.boss-attack]="bossAttacking">
+        <span class="boss-badge">
+          {{ board.currentBoss.value === 'K' ? '👑' : board.currentBoss.value === 'Q' ? '👸' : '⚔️' }}
+          {{ board.currentBoss.value === 'K' ? 'REY' : board.currentBoss.value === 'Q' ? 'REINA' : 'JOTA' }}
+        </span>
+
+        <div class="card boss-card"
+             [class.red]="isRed(board.currentBoss.suit)"
+             [class.joker]="board.currentBoss.suit === 'Joker'">
+          <span class="boss-watermark">{{ board.currentBoss.suit }}</span>
+          <span class="corner tl">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+          <span class="boss-main-value">{{ board.currentBoss.value }}</span>
+          <span class="corner br">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+        </div>
+
         <div class="boss-stats">
-          <span>❤️ {{ board.currentBoss.health }}</span>
-          <span>⚔️ {{ board.currentBoss.damage }}</span>
-        </div>
-        <div class="boss-effect" *ngIf="board.currentBoss.effects">
-          <span [class.blocked]="board.currentBoss.effectBloqued">
+          <span class="boss-stat-item hp">❤️ {{ board.currentBoss.health }}</span>
+          <span class="boss-stat-item dmg">⚔️ {{ board.currentBoss.damage }}</span>
+          <div class="boss-effect" *ngIf="board.currentBoss.effects">
             {{ board.currentBoss.effectBloqued ? '✅' : '🚫' }} {{ board.currentBoss.effects }}
-          </span>
+          </div>
         </div>
       </div>
 
-      <div class="stats-panel">
-        <div class="stat-box">🃏 Mazo<br><strong>{{ board.deck.length }}</strong></div>
-        <div class="stat-box">🗑️ Cementerio<br><strong>{{ board.grave.length }}</strong></div>
-        <div class="stat-box">👑 Jefes<br><strong>{{ board.bosses.length }}</strong></div>
+      <!-- Mazo -->
+      <div class="pile-zone">
+        <div class="pile-stack" *ngIf="board.deck.length > 0; else emptyDeck">
+          <div class="card card-back p-back"></div>
+          <div class="card card-back p-mid"></div>
+          <div class="card card-back p-front"></div>
+        </div>
+        <ng-template #emptyDeck><div class="pile-empty">—</div></ng-template>
+        <span class="pile-label">Mazo<br><strong>{{ board.deck.length }}</strong></span>
       </div>
+
     </div>
 
-    <!-- Table -->
-    <div class="section" *ngIf="board.table.length > 0">
-      <h3 class="section-title">Mesa</h3>
-      <div class="cards-row">
-        <div class="card small" *ngFor="let card of board.table"
+    <!-- 3) Cartas jugadas (mesa) -->
+    <div class="table-zone">
+      <span class="zone-label" *ngIf="board.table.length > 0">Cartas en mesa</span>
+      <div class="table-cards" *ngIf="board.table.length > 0">
+        <div class="card table-card"
+             *ngFor="let card of board.table; let i = index"
              [class.red]="isRed(card.suit)"
-             [class.joker]="card.suit === 'Joker'">
-          {{ card.value }}{{ card.suit }}
+             [class.joker]="card.suit === 'Joker'"
+             [style.animation-delay.s]="i * 0.2">
+          <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
+          <span class="suit-center">{{ card.suit }}</span>
+          <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
         </div>
+      </div>
+      <div class="table-empty" *ngIf="board.table.length === 0">
+        Ninguna carta jugada aún
       </div>
     </div>
 
-    <!-- Player Hand -->
-    <div class="section hand-section">
-      <h3 class="section-title">Tu mano ({{ hand.length }})</h3>
-      <div class="cards-row">
-        <div class="card" *ngFor="let card of hand"
+    <!-- 4) Mano + botones de acción -->
+    <div class="hand-container">
+      <button class="btn btn-defend"
+              [disabled]="!isMyTurn || board.playerPhase !== 'defend' || !selectedCards.length"
+              (click)="playTurn()">
+        🛡️ Defender
+      </button>
+
+      <div class="hand-cards">
+        <div class="card hand-card"
+             *ngFor="let card of hand; let i = index"
              [class.red]="isRed(card.suit)"
              [class.joker]="card.suit === 'Joker'"
              [class.selected]="isSelected(card)"
              [class.clickable]="isMyTurn"
+             [style.animation-delay.s]="i * 0.15"
              (click)="toggleCard(card)">
-          {{ card.value }}{{ card.suit }}
+          <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
+          <span class="suit-center">{{ card.suit }}</span>
+          <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
         </div>
-        <p class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</p>
+        <span class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</span>
       </div>
-    </div>
 
-    <!-- Play Action -->
-    <div class="play-section" *ngIf="isMyTurn">
-      <span class="selected-count" *ngIf="selectedCards.length > 0">
-        {{ selectedCards.length }} carta(s) seleccionada(s)
-      </span>
-      <button class="btn-play" [disabled]="!selectedCards.length" (click)="playTurn()">
-        {{ board.playerPhase === 'attack' ? '⚔️ Atacar' : '🛡️ Defender' }}
+      <button class="btn btn-attack"
+              [disabled]="!isMyTurn || board.playerPhase !== 'attack' || !selectedCards.length"
+              (click)="playTurn()">
+        ⚔️ Atacar
       </button>
-    </div>
-
-    <div class="waiting-turn" *ngIf="!isMyTurn">
-      <p>Esperando al otro jugador...</p>
     </div>
 
   </div>
 </div>
 
-<ng-template #loading>
-  <div class="loading-screen">
-    <p>Cargando partida...</p>
-  </div>
+<ng-template #loadingTpl>
+  <div class="loading-screen">Cargando partida...</div>
 </ng-template>

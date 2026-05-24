@@ -1,267 +1,537 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-.game {
+// ─── LAYOUT RAÍZ ───────────────────────────────────────────────────────────
+
+.game-container {
   font-family: 'Poppins', sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #121212, #1a1a2e);
+  background: #121212;
   color: #fff;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 14px;
+  width: 100vw;
+  height: 100vh;
+  padding: 14px;
+  overflow: hidden;
+  position: relative;
 }
 
-// ---------- OVERLAY ----------
+// ─── SIDEBAR ───────────────────────────────────────────────────────────────
+
+.sidebar {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.panel {
+  background: #252525;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #2a2a2a;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: transform 0.2s;
+
+  &.active-turn {
+    border-color: rgba(255,193,7,0.5);
+    background: rgba(255,193,7,0.07);
+  }
+  &:hover { transform: translateY(-1px); }
+}
+
+.player-avatar { font-size: 20px; }
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-cards { font-size: 11px; color: #888; }
+
+.turn-dot { color: #ffc107; font-size: 11px; flex-shrink: 0; }
+
+.sidebar-stats {
+  background: #252525;
+  border-radius: 8px;
+  padding: 11px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #aaa;
+  strong { color: #fff; }
+}
+
+.btn {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  &:hover:not(:disabled) { transform: translateY(-2px); }
+  &:disabled { opacity: 0.3; cursor: not-allowed; transform: none; animation: none !important; }
+}
+
+.btn-leave {
+  background: rgba(255,77,77,0.12);
+  color: #ff6b6b;
+  &:hover:not(:disabled) { background: rgba(255,77,77,0.25); }
+}
+
+// ─── MAIN AREA ─────────────────────────────────────────────────────────────
+
+.main-area {
+  background: #1a1a1a;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+// ─── TURN BANNER ───────────────────────────────────────────────────────────
+
+.turn-banner {
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.04);
+  flex-shrink: 0;
+
+  &.my-turn {
+    color: #4fc3f7;
+    background: rgba(79,195,247,0.08);
+    border: 1px solid rgba(79,195,247,0.2);
+  }
+  strong { font-weight: 600; }
+}
+
+// ─── ZONA CENTRAL ──────────────────────────────────────────────────────────
+
+.center-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex: 1;
+  min-height: 0;
+}
+
+// ── Pilas (mazo / cementerio) ───────────────────────────────────────────────
+
+.pile-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pile-stack {
+  position: relative;
+  width: 78px;
+  height: 112px;
+
+  .card-back {
+    position: absolute;
+    width: 78px;
+    height: 112px;
+    border-radius: 8px;
+
+    &.p-back  { transform: rotate(-5deg) translate(-3px, 6px); }
+    &.p-mid   { transform: rotate(3deg) translate(3px, 3px); }
+    &.p-front { transform: rotate(-1deg); }
+  }
+}
+
+.pile-empty {
+  width: 78px;
+  height: 112px;
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.2);
+  font-size: 20px;
+}
+
+.pile-label {
+  font-size: 11px;
+  text-align: center;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+  strong { color: #fff; font-size: 14px; }
+}
+
+// ── Jefe ───────────────────────────────────────────────────────────────────
+
+.boss-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  &.boss-attack .boss-card {
+    animation: bossAttack 0.65s ease-in-out !important;
+  }
+}
+
+.boss-badge {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffc107;
+  background: rgba(255,193,7,0.12);
+  border: 1px solid rgba(255,193,7,0.3);
+  border-radius: 20px;
+  padding: 3px 14px;
+}
+
+.boss-card {
+  width: 148px;
+  height: 222px;
+  flex-shrink: 0;
+  animation: float 2.4s ease-in-out infinite;
+  // Glow dorado para destacarlo
+  box-shadow:
+    0 0 0 2px rgba(255,193,7,0.7),
+    0 0 20px rgba(255,193,7,0.35),
+    0 16px 40px rgba(0,0,0,0.7) !important;
+
+  &.red {
+    box-shadow:
+      0 0 0 2px rgba(231,76,60,0.8),
+      0 0 22px rgba(231,76,60,0.4),
+      0 16px 40px rgba(0,0,0,0.7) !important;
+  }
+  &.joker {
+    box-shadow:
+      0 0 0 2px rgba(255,230,0,0.8),
+      0 0 24px rgba(255,220,0,0.5),
+      0 16px 40px rgba(0,0,0,0.7) !important;
+  }
+}
+
+.boss-watermark {
+  position: absolute;
+  font-size: 100px;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.boss-main-value {
+  position: relative;
+  font-size: 52px;
+  font-weight: 700;
+  z-index: 1;
+  line-height: 1;
+}
+
+.boss-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 18px;
+  text-align: center;
+}
+
+.boss-stat-item {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.boss-stat-item + .boss-stat-item { margin-left: 12px; }
+
+.boss-stats {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.boss-effect {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 4px;
+  flex-basis: 100%;
+}
+
+// ─── ZONA DE MESA ──────────────────────────────────────────────────────────
+
+.table-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 36px;
+}
+
+.zone-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.3);
+}
+
+.table-cards {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.table-empty {
+  font-size: 12px;
+  color: rgba(255,255,255,0.15);
+  font-style: italic;
+}
+
+// ─── MANO ──────────────────────────────────────────────────────────────────
+
+.hand-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  flex-shrink: 0;
+  padding-bottom: 2px;
+}
+
+.hand-cards {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.empty-hand {
+  font-size: 13px;
+  color: rgba(255,255,255,0.2);
+  font-style: italic;
+  padding: 20px 30px;
+}
+
+.btn-defend {
+  background: #27ae60;
+  animation: float 2s ease-in-out 0.2s infinite;
+  &:hover:not(:disabled) { background: #219a52; }
+}
+
+.btn-attack {
+  background: #c0392b;
+  animation: float 2s ease-in-out 0.4s infinite;
+  &:hover:not(:disabled) { background: #a93226; }
+}
+
+// ─── CARTAS ────────────────────────────────────────────────────────────────
+
+.card {
+  background: #f5f5f5;
+  color: #1a1a1a;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  user-select: none;
+  overflow: hidden;
+
+  &.red  { color: #c0392b; }
+  &.joker { background: linear-gradient(135deg, #fff9c4, #ffe082); color: #9a6c00; }
+}
+
+.corner {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  &.tl { top: 5px; left: 7px; }
+  &.br { bottom: 5px; right: 7px; transform: rotate(180deg); }
+}
+
+.suit-center {
+  font-size: 30px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+// Mesa: pequeñas, con float
+.table-card {
+  width: 72px;
+  height: 104px;
+  animation: float 2.2s ease-in-out infinite;
+
+  .suit-center { font-size: 26px; }
+  .corner { font-size: 9px; }
+}
+
+// Mano: interactivas, con float escalonado
+.hand-card {
+  width: 85px;
+  height: 122px;
+  animation: float 2s ease-in-out infinite;
+  transition: box-shadow 0.15s;
+  cursor: default;
+
+  &.clickable { cursor: pointer; }
+
+  &.clickable:hover:not(.selected) {
+    animation-play-state: paused;
+    transform: translateY(-10px) scale(1.06) !important;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+    z-index: 5;
+  }
+
+  &.selected {
+    animation: none !important;
+    transform: translateY(-20px);
+    box-shadow: 0 0 0 3px #4fc3f7, 0 14px 30px rgba(0,0,0,0.5) !important;
+    z-index: 5;
+  }
+}
+
+// Reverso de carta (pila mazo/cementerio)
+.card-back {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border: 2px solid rgba(255,255,255,0.12);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 5px;
+  }
+}
+
+.grave-back {
+  background: linear-gradient(135deg, #4a4a4a, #2d2d2d);
+}
+
+// ─── ANIMACIONES ───────────────────────────────────────────────────────────
+
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes bossAttack {
+  0%   { transform: translateY(0) scale(1); }
+  25%  { transform: translateY(-36px) scale(1.12); }
+  60%  { transform: translateY(8px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+// ─── OVERLAY ───────────────────────────────────────────────────────────────
+
 .overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0,0,0,0.88);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
+  border-radius: inherit;
 }
 
 .overlay-box {
-  background: rgba(255, 255, 255, 0.08);
+  background: #1e1e1e;
   border-radius: 16px;
-  padding: 48px;
+  padding: 48px 56px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 
-  h1 { font-size: 36px; margin-bottom: 12px; }
-  p  { color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+  h1 { font-size: 36px; margin-bottom: 10px; }
+  p  { color: #888; margin-bottom: 26px; }
 
   button {
-    padding: 12px 32px;
+    padding: 12px 36px;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
     background: linear-gradient(135deg, #007bff, #0056b3);
     color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
     transition: transform 0.2s;
     &:hover { transform: translateY(-2px); }
   }
 }
 
-// ---------- HEADER ----------
-.game-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
+// ─── LOADING ───────────────────────────────────────────────────────────────
 
-.turn-indicator {
-  font-size: 15px;
-  color: rgba(255,255,255,0.5);
-  transition: color 0.3s;
-
-  &.my-turn {
-    color: #4fc3f7;
-    font-weight: 600;
-  }
-}
-
-.btn-leave {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255,77,77,0.15);
-  color: #ff6b6b;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s;
-  &:hover { background: rgba(255,77,77,0.3); }
-}
-
-// ---------- BODY ----------
-.game-body {
-  flex: 1;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-// ---------- TOP ROW ----------
-.top-row {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-// ---------- BOSS CARD ----------
-.boss-card {
-  background: #f5f5f5;
-  color: #111;
-  border-radius: 14px;
-  padding: 16px 20px;
-  min-width: 150px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-
-  &.red { color: #c0392b; }
-}
-
-.boss-title {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #888;
-  margin-bottom: 6px;
-}
-
-.boss-face {
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: 10px;
-}
-
-.boss-stats {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.boss-effect {
-  font-size: 11px;
-  color: #666;
-  .blocked { color: #27ae60; }
-}
-
-// ---------- STATS PANEL ----------
-.stats-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.stat-box {
-  background: rgba(255,255,255,0.07);
-  border-radius: 10px;
-  padding: 10px 18px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  text-align: center;
-
-  strong {
-    display: block;
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-  }
-}
-
-// ---------- SECTIONS ----------
-.section { display: flex; flex-direction: column; gap: 8px; }
-
-.section-title {
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255,255,255,0.5);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-// ---------- CARDS ----------
-.cards-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-end;
-}
-
-.card {
-  background: #f5f5f5;
-  color: #111;
-  border-radius: 10px;
-  width: 62px;
-  height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
-  user-select: none;
-
-  &.red     { color: #c0392b; }
-  &.joker   { background: linear-gradient(135deg, #fff7a1, #ffe066); color: #b8860b; }
-  &.small   { width: 50px; height: 70px; font-size: 15px; }
-  &.clickable { cursor: pointer; }
-  &.clickable:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-  &.selected {
-    transform: translateY(-10px);
-    box-shadow: 0 0 0 3px #4fc3f7, 0 8px 20px rgba(0,0,0,0.4);
-  }
-}
-
-.empty-hand {
-  color: rgba(255,255,255,0.3);
-  font-style: italic;
-  font-size: 14px;
-  margin: 0;
-}
-
-// ---------- PLAY SECTION ----------
-.hand-section { margin-top: 8px; }
-
-.play-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.selected-count {
-  font-size: 14px;
-  color: #4fc3f7;
-}
-
-.btn-play {
-  padding: 13px 32px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  background: linear-gradient(135deg, #28a745, #218838);
-  color: #fff;
-  transition: all 0.25s;
-
-  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-}
-
-.waiting-turn {
-  text-align: center;
-  color: rgba(255,255,255,0.3);
-  font-size: 14px;
-  padding: 12px 0;
-}
-
-// ---------- LOADING ----------
 .loading-screen {
+  font-family: 'Poppins', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #121212, #1a1a2e);
-  color: rgba(255,255,255,0.4);
-  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: rgba(255,255,255,0.3);
+  font-size: 18px;
 }
