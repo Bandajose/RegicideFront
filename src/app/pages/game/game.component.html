@@ -1,2 +1,96 @@
-<h1>Juego en progreso</h1>
-<a routerLink="/">Salir del juego</a>
+<div class="game" *ngIf="board; else loading">
+
+  <!-- End Game Overlay -->
+  <div class="overlay" *ngIf="board.endGame">
+    <div class="overlay-box">
+      <h1>{{ board.winGame ? '🏆 ¡Ganaron!' : '💀 Han perdido' }}</h1>
+      <p *ngIf="board.winGame">Derrotaron a todos los jefes.</p>
+      <p *ngIf="!board.winGame">El jefe hizo demasiado daño.</p>
+      <button (click)="leaveGame()">Volver al Inicio</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="game-header">
+    <div class="turn-indicator" [class.my-turn]="isMyTurn">
+      <span *ngIf="isMyTurn">⚔️ Tu turno — Fase: <strong>{{ board.playerPhase }}</strong></span>
+      <span *ngIf="!isMyTurn">⏳ Turno de otro jugador</span>
+    </div>
+    <button class="btn-leave" (click)="leaveGame()">🚪 Salir</button>
+  </div>
+
+  <div class="game-body">
+
+    <!-- Boss + Stats -->
+    <div class="top-row">
+      <div class="boss-card" [class.red]="isRed(board.currentBoss.suit)">
+        <div class="boss-title">Jefe Actual</div>
+        <div class="boss-face">{{ board.currentBoss.value }}{{ board.currentBoss.suit }}</div>
+        <div class="boss-stats">
+          <span>❤️ {{ board.currentBoss.health }}</span>
+          <span>⚔️ {{ board.currentBoss.damage }}</span>
+        </div>
+        <div class="boss-effect" *ngIf="board.currentBoss.effects">
+          <span [class.blocked]="board.currentBoss.effectBloqued">
+            {{ board.currentBoss.effectBloqued ? '✅' : '🚫' }} {{ board.currentBoss.effects }}
+          </span>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stat-box">🃏 Mazo<br><strong>{{ board.deck.length }}</strong></div>
+        <div class="stat-box">🗑️ Cementerio<br><strong>{{ board.grave.length }}</strong></div>
+        <div class="stat-box">👑 Jefes<br><strong>{{ board.bosses.length }}</strong></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="section" *ngIf="board.table.length > 0">
+      <h3 class="section-title">Mesa</h3>
+      <div class="cards-row">
+        <div class="card small" *ngFor="let card of board.table"
+             [class.red]="isRed(card.suit)"
+             [class.joker]="card.suit === 'Joker'">
+          {{ card.value }}{{ card.suit }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Hand -->
+    <div class="section hand-section">
+      <h3 class="section-title">Tu mano ({{ hand.length }})</h3>
+      <div class="cards-row">
+        <div class="card" *ngFor="let card of hand"
+             [class.red]="isRed(card.suit)"
+             [class.joker]="card.suit === 'Joker'"
+             [class.selected]="isSelected(card)"
+             [class.clickable]="isMyTurn"
+             (click)="toggleCard(card)">
+          {{ card.value }}{{ card.suit }}
+        </div>
+        <p class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</p>
+      </div>
+    </div>
+
+    <!-- Play Action -->
+    <div class="play-section" *ngIf="isMyTurn">
+      <span class="selected-count" *ngIf="selectedCards.length > 0">
+        {{ selectedCards.length }} carta(s) seleccionada(s)
+      </span>
+      <button class="btn-play" [disabled]="!selectedCards.length" (click)="playTurn()">
+        {{ board.playerPhase === 'attack' ? '⚔️ Atacar' : '🛡️ Defender' }}
+      </button>
+    </div>
+
+    <div class="waiting-turn" *ngIf="!isMyTurn">
+      <p>Esperando al otro jugador...</p>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-screen">
+    <p>Cargando partida...</p>
+  </div>
+</ng-template>

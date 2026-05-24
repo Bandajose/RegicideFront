@@ -1,54 +1,52 @@
-<div class="home"> 
-    <div class="container-wrapper">
-        <div class="container left-container">
-            <h2>Sala</h2>
-            <div class="input-container">
-                <input type="text" [(ngModel)]="roomName" placeholder="Ingresar ID de la sala">
-                <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-            </div>
-        
-            <div class="button-container">
-                <button style="background: #007bff;">🔍 Buscar</button>
-            </div>
-            
-            <div class="button-container">
-                <button (click)="joinRoom()" [disabled]="loading">
-                    <span *ngIf="!loading">🔑 Unirse</span>
-                    <div *ngIf="loading" class="loading"></div>
-                </button>
-            </div> 
+<div class="home">
+  <div class="container-wrapper">
 
-            <div class="button-container">
-                <button style="background: #007bff;" (click)="createRoom()">➕ Crear Sala</button>
-            </div>
-        </div>
-        
-        <div class="container right-container">
-            <h2>📋 Salas Disponibles</h2>
-            <ul class="room-list">
-                <li *ngFor="let room of dataRooms.rooms" (click)="joinRoomByName(room.roomName)">
-                    🎮 <span style="flex:1;">{{ room.roomName }}</span>
-                    👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}
-                </li>
-            </ul>
+    <div class="container left-container">
+      <h2>Sala</h2>
 
-            <div class="pagination">
-                <button [disabled]="dataRooms.currentPage === '1'">◀</button>
-                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
-                <button [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
-            </div>
+      <div class="input-container">
+        <input type="text" [(ngModel)]="roomName" placeholder="Nombre de la sala" />
+        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      </div>
 
-            <!-- <div class="pagination">
-                <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
-                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
-                <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
-            </div> -->
+      <div class="button-container">
+        <button (click)="joinRoom()" [disabled]="loading">
+          <span *ngIf="!loading">🔑 Unirse</span>
+          <div *ngIf="loading" class="spinner"></div>
+        </button>
+      </div>
 
-            <!-- <div class="pagination" *ngIf="dataRooms.roomList.length > 0">
-                <button>◀</button>
-                <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
-                <button>▶</button>
-            </div> -->
-        </div>
+      <div class="button-container">
+        <button class="btn-primary" (click)="createRoom()" [disabled]="loading">
+          ➕ Crear Sala
+        </button>
+      </div>
     </div>
+
+    <div class="container right-container">
+      <h2>📋 Salas Disponibles</h2>
+
+      <div class="search-container">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Filtrar salas..." />
+        <button class="btn-search" (click)="searchRooms()">🔍</button>
+      </div>
+
+      <ul class="room-list">
+        <li *ngFor="let room of filteredRooms" (click)="joinRoomByName(room.roomName)">
+          🎮 <span class="room-name">{{ room.roomName }}</span>
+          <span class="room-players">👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}</span>
+        </li>
+        <li *ngIf="filteredRooms.length === 0" class="empty">
+          Sin salas disponibles
+        </li>
+      </ul>
+
+      <div class="pagination">
+        <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
+        <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
+      </div>
+    </div>
+
+  </div>
 </div>

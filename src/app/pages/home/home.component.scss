@@ -112,15 +112,55 @@ button:disabled {
     box-shadow: none;
 }
 
-/* Animación de carga mejorada */
-.loading {
-    display: none;
+.spinner {
     width: 20px;
     height: 20px;
-    border: 3px solid #fff;
-    border-top: 3px solid transparent;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-top: 3px solid #fff;
     border-radius: 50%;
     animation: spin 0.6s linear infinite;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 8px;
+
+    input {
+        flex: 1;
+        max-width: 270px;
+        margin: 0;
+    }
+
+    .btn-search {
+        width: auto;
+        padding: 10px 14px;
+        background: #007bff;
+    }
+}
+
+.room-name {
+    flex: 1;
+    text-align: left;
+}
+
+.room-players {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.room-list .empty {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    cursor: default;
+    background: transparent;
+    &:hover { background: transparent; transform: none; }
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
 }
 
 @keyframes spin {

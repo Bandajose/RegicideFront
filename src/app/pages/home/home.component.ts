@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { SocketService } from '../../../services/socket.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CreateRoomRequest } from '../../Data/CreateRoomRequest';
 import { RoomResponse } from '../../Data/RoomResponse';
+import { Room } from '../../Data/Room';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -12,80 +14,111 @@ import { RoomResponse } from '../../Data/RoomResponse';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit {
-
-  dataRooms: RoomResponse = {
-    rooms: [],
-    totalRooms: '0',
-    totalPages: '0',
-    currentPage: '1'
-  };
-  
+export class HomeComponent implements OnInit, OnDestroy {
+  dataRooms: RoomResponse = { rooms: [], totalRooms: '0', totalPages: '1', currentPage: '1' };
   errorMessage: string = '';
   loading: boolean = false;
   roomName: string = '';
+  searchQuery: string = '';
 
+  private currentPage: string = '1';
+  private pageSize: string = '5';
+  private destroy$ = new Subject<void>();
 
-  constructor(private socketService: SocketService) { }
+  constructor(private socketService: SocketService, private router: Router) {}
 
   ngOnInit() {
-    //Obtener las salas
-
-    this.socketService.getRooms({ page: '1', size: '5' });
-
-    //Escuchar por cambios en las salas
-    this.socketService.updateRooms().subscribe(roomsResponse => {
-      console.log("📥 Salas recibidas:", roomsResponse);
-      this.dataRooms = roomsResponse;
-      console.log("📥 Salas recibidas: this.rooms ", this.dataRooms);
-
+    this.socketService.getRooms({ page: this.currentPage, size: this.pageSize });
+    this.socketService.updateRooms$.pipe(takeUntil(this.destroy$)).subscribe(rooms => {
+      this.dataRooms = rooms;
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  get filteredRooms(): Room[] {
+    if (!this.searchQuery.trim()) return this.dataRooms.rooms;
+    return this.dataRooms.rooms.filter(r =>
+      r.roomName.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
+  searchRooms() {
+    this.socketService.getRooms({ page: '1', size: this.pageSize });
+    this.currentPage = '1';
   }
 
   joinRoom() {
     if (!this.roomName.trim()) {
-      this.errorMessage = 'Por favor, ingresa un ID válido.';
+      this.errorMessage = 'Por favor, ingresa el nombre de la sala.';
+      return;
+    }
+    this.errorMessage = '';
+    this.loading = true;
+    this.socketService.joinRoom(this.roomName.trim()).subscribe(response => {
+      this.loading = false;
+      if (response.success) {
+        this.router.navigate(['/lobby']);
+      } else {
+        this.errorMessage = response.message || 'Error al unirse a la sala.';
+      }
+    });
+  }
+
+  joinRoomByName(name: string) {
+    this.loading = true;
+    this.errorMessage = '';
+    this.socketService.joinRoom(name).subscribe(response => {
+      this.loading = false;
+      if (response.success) {
+        this.router.navigate(['/lobby']);
+      } else {
+        this.errorMessage = response.message || 'Error al unirse a la sala.';
+      }
+    });
+  }
+
+  createRoom() {
+    if (!this.roomName.trim()) {
+      this.errorMessage = 'Por favor, ingresa un nombre para la sala.';
       return;
     }
     this.errorMessage = '';
     this.loading = true;
 
-    setTimeout(() => {
-      alert(`Uniéndote a la sala con ID: ${this.roomName}`);
-      this.loading = false;
-    }, 1500);
-  }
+    const request: CreateRoomRequest = { roomName: this.roomName.trim(), page: '1', size: this.pageSize };
 
-  joinRoomByName(roomName: string) {
-    alert(`Uniéndote a la sala: ${roomName}`);
-  }
-
-  createRoom() {
-    if (!this.roomName.trim()) return;
-    console.log('Creando sala con nombre:', this.roomName);
-
-    const roomRequest: CreateRoomRequest = {
-      roomName: this.roomName,
-      page: '1',
-      size: '5'
-    };
-
-
-    this.socketService.createRoom(roomRequest).subscribe(response => {
-      // this.message = response.message;
+    this.socketService.createRoom(request).subscribe(response => {
       if (response.success) {
-        //entrar a la sala creada
-      }
-      else
-      {
-        this.errorMessage = response.message || 'Error al crear la sala';
-        console.error('Error al crear la sala:', this.errorMessage);
+        this.socketService.joinRoom(this.roomName.trim()).subscribe(joinResponse => {
+          this.loading = false;
+          if (joinResponse.success) {
+            this.router.navigate(['/lobby']);
+          } else {
+            this.errorMessage = joinResponse.message || 'Error al unirse a la sala creada.';
+          }
+        });
+      } else {
+        this.loading = false;
+        this.errorMessage = response.message || 'Error al crear la sala.';
       }
     });
-
   }
 
-  // get filteredRooms() {
-  //   return this.rooms.filter(room => room.roomName.toLowerCase().includes(this.roomName.toLowerCase()));
-  // }
+  prevPage() {
+    const page = parseInt(this.currentPage);
+    if (page <= 1) return;
+    this.currentPage = String(page - 1);
+    this.socketService.getRooms({ page: this.currentPage, size: this.pageSize });
+  }
+
+  nextPage() {
+    const page = parseInt(this.currentPage);
+    if (page >= parseInt(this.dataRooms.totalPages)) return;
+    this.currentPage = String(page + 1);
+    this.socketService.getRooms({ page: this.currentPage, size: this.pageSize });
+  }
 }

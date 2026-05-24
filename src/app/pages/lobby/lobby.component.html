@@ -1,3 +1,40 @@
-<h1>Lobby - Esperando jugadores</h1>
-<a routerLink="/">Volver al inicio</a>
-<a routerLink="/game">Iniciar partida</a>
+<div class="lobby">
+  <div class="lobby-container">
+
+    <div class="lobby-header">
+      <h1>🏰 Sala: <span class="room-tag">{{ roomName }}</span></h1>
+    </div>
+
+    <div class="players-section">
+      <h2>Jugadores ({{ players.length }} / 6)</h2>
+      <ul class="player-list">
+        <li *ngFor="let player of players; let i = index"
+            [class.you]="player === playerId">
+          <span class="player-icon">{{ i === 0 ? '👑' : '🎮' }}</span>
+          <span class="player-name">
+            {{ player === playerId ? 'Tú' : 'Jugador ' + (i + 1) }}
+          </span>
+          <span class="host-badge" *ngIf="i === 0">Anfitrión</span>
+          <span class="you-badge" *ngIf="player === playerId">Tú</span>
+        </li>
+      </ul>
+
+      <p class="waiting-msg" *ngIf="!canStart">
+        ⏳ Esperando jugadores... (mínimo 2 para iniciar)
+      </p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-start" *ngIf="isHost" [disabled]="!canStart" (click)="startGame()">
+        🚀 Iniciar Partida
+      </button>
+      <p class="waiting-host" *ngIf="!isHost && canStart">
+        Esperando que el anfitrión inicie...
+      </p>
+      <button class="btn-leave" (click)="leaveRoom()">
+        🚪 Salir de la Sala
+      </button>
+    </div>
+
+  </div>
+</div>
