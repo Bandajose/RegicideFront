@@ -28,6 +28,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.socketService.rejoinFailed$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.router.navigate(['/']);
+    });
+
     this.socketService.lobbyUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
       this.players = update.players;
       this.config = { ...update.config };

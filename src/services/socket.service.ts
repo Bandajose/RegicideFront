@@ -17,29 +17,68 @@ export interface LobbyUpdate {
 export class SocketService {
   private socket: Socket;
 
-  currentRoom = '';
-  playerId = '';
+  // ─── Estado persistente (sobrevive recargas) ─────────────────────────────
 
-  get playerName(): string {
-    return localStorage.getItem('playerName') ?? '';
+  get currentRoom(): string { return localStorage.getItem('currentRoom') ?? ''; }
+  set currentRoom(value: string) {
+    value ? localStorage.setItem('currentRoom', value) : localStorage.removeItem('currentRoom');
   }
-  set playerName(name: string) {
-    localStorage.setItem('playerName', name.trim());
+
+  get playerId(): string { return localStorage.getItem('playerId') ?? ''; }
+  set playerId(value: string) {
+    value ? localStorage.setItem('playerId', value) : localStorage.removeItem('playerId');
   }
+
+  get playerName(): string { return localStorage.getItem('playerName') ?? ''; }
+  set playerName(name: string) { localStorage.setItem('playerName', name.trim()); }
+
+  private get sessionId(): string {
+    let id = localStorage.getItem('sessionId');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('sessionId', id);
+    }
+    return id;
+  }
+
+  // ─── Observables ──────────────────────────────────────────────────────────
 
   readonly updateRooms$: Observable<RoomResponse>;
   readonly lobbyUpdate$: Observable<LobbyUpdate>;
   readonly boardStatus$: Observable<Board>;
   readonly playerData$: Observable<{ hand: any[] }>;
   readonly kicked$: Observable<void>;
+  readonly rejoinFailed$: Observable<void>;
 
   constructor() {
     this.socket = io('http://localhost:3000/');
-    this.updateRooms$  = this.listen<RoomResponse>('updateRooms');
-    this.lobbyUpdate$  = this.listen<LobbyUpdate>('updateLobby');
-    this.boardStatus$  = this.listen<Board>('boardStatus');
-    this.playerData$   = this.listen<{ hand: any[] }>('getPlayerData');
-    this.kicked$       = this.listen<void>('kicked');
+    this.updateRooms$   = this.listen<RoomResponse>('updateRooms');
+    this.lobbyUpdate$   = this.listen<LobbyUpdate>('updateLobby');
+    this.boardStatus$   = this.listen<Board>('boardStatus');
+    this.playerData$    = this.listen<{ hand: any[] }>('getPlayerData');
+    this.kicked$        = this.listen<void>('kicked');
+    this.rejoinFailed$  = this.listen<void>('rejoinFailed');
+
+    // Al (re)conectar: si hay sala guardada intentar reconectar
+    this.socket.on('connect', () => {
+      if (this.currentRoom) {
+        this.socket.emit('rejoinRoom', {
+          roomName:  this.currentRoom,
+          sessionId: this.sessionId,
+        });
+      }
+    });
+
+    // Al reconectar con éxito, actualizar el playerId con el nuevo socket.id
+    this.socket.on('rejoinSuccess', (data: { playerId: string }) => {
+      this.playerId = data.playerId;
+    });
+
+    // Al fallar la reconexión, limpiar estado
+    this.socket.on('rejoinFailed', () => {
+      this.currentRoom = '';
+      this.playerId = '';
+    });
   }
 
   private listen<T>(event: string): Observable<T> {
@@ -67,10 +106,14 @@ export class SocketService {
 
   joinRoom(roomName: string): Observable<any> {
     return new Observable(observer => {
-      this.socket.emit('joinRoom', { roomName, playerName: this.playerName }, (response: any) => {
+      this.socket.emit('joinRoom', {
+        roomName,
+        playerName: this.playerName,
+        sessionId:  this.sessionId,
+      }, (response: any) => {
         if (response?.success) {
           this.currentRoom = roomName;
-          this.playerId = response.playerId;
+          this.playerId    = response.playerId;
         }
         observer.next(response);
         observer.complete();

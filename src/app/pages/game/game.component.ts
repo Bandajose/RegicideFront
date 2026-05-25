@@ -29,6 +29,10 @@ export class GameComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.socketService.rejoinFailed$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.router.navigate(['/']);
+    });
+
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
       if (this.lastPhase === 'defend' && board.playerPhase === 'attack') {
         this.triggerBossAttack();
