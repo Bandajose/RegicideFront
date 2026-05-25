@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from '../../../services/socket.service';
+import { Board } from '../../Data/Board';
+import { Card } from '../../Data/Card';
 
 @Component({
   selector: 'app-game',
@@ -11,17 +13,17 @@ import { SocketService } from '../../../services/socket.service';
   styleUrl: './game.component.scss'
 })
 export class GameComponent implements OnInit, OnDestroy {
-  board: any = null;
-  hand: any[] = [];
-  selectedCards: any[] = [];
-  bossAttacking: boolean = false;
+  board: Board | null = null;
+  hand: Card[] = [];
+  selectedCards: Card[] = [];
+  bossAttacking = false;
 
-  private lastPhase: string = '';
+  private lastPhase = '';
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (!this.socketService.currentRoom) {
       this.router.navigate(['/']);
       return;
@@ -42,10 +44,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.socketService.requestBoardStatus(this.socketService.currentRoom);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  // ─── Getters de conveniencia ───────────────────────────────────────────
 
   get playerId(): string {
     return this.socketService.playerId;
@@ -60,14 +64,14 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get deckStack(): number[] {
-    const count = Math.min(this.board?.deck?.length ?? 0, 3);
-    return Array(count).fill(0);
+    return Array(Math.min(this.board?.deck.length ?? 0, 3)).fill(0);
   }
 
   get graveStack(): number[] {
-    const count = Math.min(this.board?.grave?.length ?? 0, 3);
-    return Array(count).fill(0);
+    return Array(Math.min(this.board?.grave.length ?? 0, 3)).fill(0);
   }
+
+  // ─── Helpers de presentación ──────────────────────────────────────────
 
   shortId(id: string): string {
     return id ? id.slice(0, 6) + '…' : '';
@@ -77,19 +81,21 @@ export class GameComponent implements OnInit, OnDestroy {
     return suit === '♥' || suit === '♦';
   }
 
-  isSelected(card: any): boolean {
+  isSelected(card: Card): boolean {
     return this.selectedCards.some(c => c.value === card.value && c.suit === card.suit);
   }
 
-  toggleCard(card: any) {
+  // ─── Acciones del jugador ─────────────────────────────────────────────
+
+  toggleCard(card: Card): void {
     if (!this.isMyTurn) return;
     const idx = this.selectedCards.findIndex(c => c.value === card.value && c.suit === card.suit);
     if (idx >= 0) this.selectedCards.splice(idx, 1);
     else this.selectedCards.push(card);
   }
 
-  playTurn() {
-    if (!this.isMyTurn || !this.selectedCards.length) return;
+  playTurn(): void {
+    if (!this.isMyTurn || !this.selectedCards.length || !this.board) return;
     this.socketService.playTurn(
       this.socketService.currentRoom,
       this.playerId,
@@ -99,14 +105,16 @@ export class GameComponent implements OnInit, OnDestroy {
     this.selectedCards = [];
   }
 
-  private triggerBossAttack() {
-    this.bossAttacking = true;
-    setTimeout(() => (this.bossAttacking = false), 650);
-  }
-
-  leaveGame() {
+  leaveGame(): void {
     this.socketService.currentRoom = '';
     this.socketService.playerId = '';
     this.router.navigate(['/']);
+  }
+
+  // ─── Animación del jefe ───────────────────────────────────────────────
+
+  private triggerBossAttack(): void {
+    this.bossAttacking = true;
+    setTimeout(() => (this.bossAttacking = false), 650);
   }
 }
