@@ -4,25 +4,35 @@ import { Observable } from 'rxjs';
 import { Pagination } from '../app/Data/Pagination';
 import { CreateRoomRequest } from '../app/Data/CreateRoomRequest';
 import { RoomResponse } from '../app/Data/RoomResponse';
+import { RoomConfig } from '../app/Data/RoomConfig';
+import { LobbyPlayer } from '../app/Data/LobbyPlayer';
+import { Board } from '../app/Data/Board';
+
+export interface LobbyUpdate {
+  players: LobbyPlayer[];
+  config: RoomConfig;
+}
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket: Socket;
 
-  currentRoom: string = '';
-  playerId: string = '';
+  currentRoom = '';
+  playerId = '';
 
   readonly updateRooms$: Observable<RoomResponse>;
-  readonly players$: Observable<string[]>;
-  readonly boardStatus$: Observable<any>;
-  readonly playerData$: Observable<any>;
+  readonly lobbyUpdate$: Observable<LobbyUpdate>;
+  readonly boardStatus$: Observable<Board>;
+  readonly playerData$: Observable<{ hand: any[] }>;
+  readonly kicked$: Observable<void>;
 
   constructor() {
     this.socket = io('http://localhost:3000/');
-    this.updateRooms$ = this.listen<RoomResponse>('updateRooms');
-    this.players$ = this.listen<string[]>('updatePlayers');
-    this.boardStatus$ = this.listen<any>('boardStatus');
-    this.playerData$ = this.listen<any>('getPlayerData');
+    this.updateRooms$  = this.listen<RoomResponse>('updateRooms');
+    this.lobbyUpdate$  = this.listen<LobbyUpdate>('updateLobby');
+    this.boardStatus$  = this.listen<Board>('boardStatus');
+    this.playerData$   = this.listen<{ hand: any[] }>('getPlayerData');
+    this.kicked$       = this.listen<void>('kicked');
   }
 
   private listen<T>(event: string): Observable<T> {
@@ -33,7 +43,9 @@ export class SocketService {
     });
   }
 
-  getRooms(pagination: Pagination) {
+  // ─── Salas ──────────────────────────────────────────────────────────────
+
+  getRooms(pagination: Pagination): void {
     this.socket.emit('getRooms', pagination);
   }
 
@@ -59,15 +71,36 @@ export class SocketService {
     });
   }
 
-  startGame(room: string) {
-    this.socket.emit('startGame', room);
+  // ─── Lobby ──────────────────────────────────────────────────────────────
+
+  setConfig(config: RoomConfig): void {
+    this.socket.emit('setConfig', { roomName: this.currentRoom, config });
   }
 
-  requestBoardStatus(room: string) {
-    this.socket.emit('getBoardStatus', room);
+  toggleReady(): void {
+    this.socket.emit('setReady', this.currentRoom);
   }
 
-  playTurn(room: string, playerId: string, action: string, cards: any[]) {
-    this.socket.emit('playTurn', { roomName: room, playerId, action, cards });
+  kickPlayer(targetId: string): void {
+    this.socket.emit('kickPlayer', { roomName: this.currentRoom, targetId });
+  }
+
+  // ─── Partida ────────────────────────────────────────────────────────────
+
+  startGame(): void {
+    this.socket.emit('startGame', this.currentRoom);
+  }
+
+  requestBoardStatus(): void {
+    this.socket.emit('getBoardStatus', this.currentRoom);
+  }
+
+  playTurn(action: string, cards: any[]): void {
+    this.socket.emit('playTurn', {
+      roomName: this.currentRoom,
+      playerId: this.playerId,
+      action,
+      cards,
+    });
   }
 }

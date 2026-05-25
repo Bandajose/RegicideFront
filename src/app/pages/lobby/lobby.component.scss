@@ -8,16 +8,20 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #121212, #1e1e1e);
   color: #fff;
+  padding: 24px 0;
 }
 
 .lobby-container {
   width: 90%;
-  max-width: 500px;
+  max-width: 540px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 @keyframes fadeIn {
@@ -28,91 +32,213 @@
 .lobby-header h1 {
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 24px;
   text-align: center;
+  margin: 0;
 }
 
 .room-tag {
   color: #4fc3f7;
 }
 
+// ─── Config ───────────────────────────────────────────────────────────────────
+
+.config-section h2,
 .players-section h2 {
-  font-size: 16px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
 }
+
+.config-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+.config-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.config-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba(79, 195, 247, 0.25);
+    border-color: rgba(79, 195, 247, 0.4);
+    transform: none;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.ctrl-value {
+  min-width: 24px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ctrl-toggle {
+  padding: 5px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: auto;
+
+  &.active {
+    background: rgba(79, 195, 247, 0.18);
+    border-color: rgba(79, 195, 247, 0.45);
+    color: #4fc3f7;
+  }
+
+  &:disabled {
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// ─── Players ──────────────────────────────────────────────────────────────────
 
 .player-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 16px;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .player-list li {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  padding: 12px 16px;
-  transition: background 0.2s;
-}
+  padding: 10px 14px;
+  border: 1px solid transparent;
 
-.player-list li.you {
-  background: rgba(79, 195, 247, 0.15);
-  border: 1px solid rgba(79, 195, 247, 0.3);
+  &.you {
+    background: rgba(79, 195, 247, 0.1);
+    border-color: rgba(79, 195, 247, 0.22);
+  }
 }
 
 .player-icon {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .player-name {
   flex: 1;
+  font-size: 14px;
   font-weight: 500;
 }
 
 .host-badge {
   font-size: 11px;
-  background: rgba(255, 193, 7, 0.2);
+  background: rgba(255, 193, 7, 0.12);
   color: #ffd54f;
-  border: 1px solid rgba(255, 193, 7, 0.4);
+  border: 1px solid rgba(255, 193, 7, 0.3);
   border-radius: 20px;
   padding: 2px 10px;
 }
 
-.you-badge {
+.ready-badge {
   font-size: 11px;
-  background: rgba(79, 195, 247, 0.2);
-  color: #4fc3f7;
-  border: 1px solid rgba(79, 195, 247, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   padding: 2px 10px;
+  white-space: nowrap;
+
+  &.ready {
+    background: rgba(40, 167, 69, 0.12);
+    color: #69f0ae;
+    border-color: rgba(40, 167, 69, 0.3);
+  }
+}
+
+.btn-kick {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 77, 77, 0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 77, 77, 0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: auto;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 77, 77, 0.22);
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 .waiting-msg {
   text-align: center;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
-  margin: 8px 0 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  margin: 10px 0 0;
 }
 
-.waiting-host {
-  text-align: center;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
-  margin: 8px 0;
-}
+// ─── Actions ──────────────────────────────────────────────────────────────────
 
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
 }
 
 button {
@@ -120,22 +246,34 @@ button {
   padding: 13px;
   border: none;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
+.btn-ready {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  &.active {
+    background: rgba(40, 167, 69, 0.18);
+    color: #69f0ae;
+    border-color: rgba(40, 167, 69, 0.38) !important;
+  }
 }
 
 .btn-start {
@@ -143,13 +281,20 @@ button:disabled {
   color: #fff;
 }
 
-.btn-leave {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 400;
+.waiting-host {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  margin: 0;
 }
 
-.btn-leave:hover {
-  background: rgba(255, 77, 77, 0.2);
-  color: #ff6b6b;
+.btn-leave {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 400;
+
+  &:hover {
+    background: rgba(255, 77, 77, 0.12);
+    color: #ff6b6b;
+  }
 }

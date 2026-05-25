@@ -41,7 +41,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.hand = data.hand;
     });
 
-    this.socketService.requestBoardStatus(this.socketService.currentRoom);
+    this.socketService.requestBoardStatus();
   }
 
   ngOnDestroy(): void {
@@ -96,12 +96,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   playTurn(): void {
     if (!this.isMyTurn || !this.selectedCards.length || !this.board) return;
-    this.socketService.playTurn(
-      this.socketService.currentRoom,
-      this.playerId,
-      this.board.playerPhase,
-      this.selectedCards
-    );
+    this.socketService.playTurn(this.board.playerPhase, this.selectedCards);
     this.selectedCards = [];
   }
 

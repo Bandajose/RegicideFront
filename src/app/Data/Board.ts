@@ -12,5 +12,6 @@ export interface Board {
   playerPhase: 'attack' | 'defend' | 'Joker';
   endGame: boolean;
   winGame: boolean;
+  lives: number;
   players: GamePlayer[];
 }

@@ -2,37 +2,101 @@
   <div class="lobby-container">
 
     <div class="lobby-header">
-      <h1>🏰 Sala: <span class="room-tag">{{ roomName }}</span></h1>
+      <h1>Sala: <span class="room-tag">{{ roomName }}</span></h1>
     </div>
 
+    <!-- Config Panel -->
+    <div class="config-section">
+      <h2>Configuración</h2>
+      <div class="config-grid">
+
+        <div class="config-row">
+          <span class="config-label">Jugadores Máx.</span>
+          <div class="config-control">
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('maxPlayers', -1)">−</button>
+            <span class="ctrl-value">{{ config.maxPlayers }}</span>
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('maxPlayers', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Cartas en Mano</span>
+          <div class="config-control">
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('handSize', -1)">−</button>
+            <span class="ctrl-value">{{ config.handSize }}</span>
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('handSize', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Vidas</span>
+          <div class="config-control">
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('lives', -1)">−</button>
+            <span class="ctrl-value">{{ config.lives }}</span>
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustConfig('lives', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Bosses Aleatorios</span>
+          <div class="config-control">
+            <button class="ctrl-toggle"
+                    [class.active]="config.randomBosses"
+                    [disabled]="!isHost"
+                    (click)="toggleRandomBosses()">
+              {{ config.randomBosses ? 'Sí' : 'No' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Players Section -->
     <div class="players-section">
-      <h2>Jugadores ({{ players.length }} / 6)</h2>
+      <h2>Jugadores ({{ players.length }} / {{ config.maxPlayers }})</h2>
       <ul class="player-list">
         <li *ngFor="let player of players; let i = index"
-            [class.you]="player === playerId">
+            [class.you]="player.id === playerId">
           <span class="player-icon">{{ i === 0 ? '👑' : '🎮' }}</span>
           <span class="player-name">
-            {{ player === playerId ? 'Tú' : 'Jugador ' + (i + 1) }}
+            {{ player.id === playerId ? 'Tú' : 'Jugador ' + (i + 1) }}
           </span>
           <span class="host-badge" *ngIf="i === 0">Anfitrión</span>
-          <span class="you-badge" *ngIf="player === playerId">Tú</span>
+          <span class="ready-badge" *ngIf="i > 0" [class.ready]="player.ready">
+            {{ player.ready ? '✅ Listo' : '⏳ Esperando' }}
+          </span>
+          <button class="btn-kick"
+                  *ngIf="isHost && player.id !== playerId"
+                  (click)="kickPlayer(player.id)">
+            Expulsar
+          </button>
         </li>
       </ul>
 
-      <p class="waiting-msg" *ngIf="!canStart">
-        ⏳ Esperando jugadores... (mínimo 2 para iniciar)
+      <p class="waiting-msg" *ngIf="players.length < 2">
+        Esperando jugadores... (mínimo 2 para iniciar)
+      </p>
+      <p class="waiting-msg" *ngIf="players.length >= 2 && !canStart && isHost">
+        Esperando que los jugadores estén listos...
       </p>
     </div>
 
+    <!-- Actions -->
     <div class="actions">
+      <button class="btn-ready" *ngIf="!isHost"
+              [class.active]="isReady"
+              (click)="toggleReady()">
+        {{ isReady ? '✅ Listo' : '⏳ Marcar como Listo' }}
+      </button>
       <button class="btn-start" *ngIf="isHost" [disabled]="!canStart" (click)="startGame()">
-        🚀 Iniciar Partida
+        Iniciar Partida
       </button>
       <p class="waiting-host" *ngIf="!isHost && canStart">
         Esperando que el anfitrión inicie...
       </p>
       <button class="btn-leave" (click)="leaveRoom()">
-        🚪 Salir de la Sala
+        Salir de la Sala
       </button>
     </div>
 

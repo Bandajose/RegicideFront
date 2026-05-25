@@ -3,6 +3,8 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from '../../../services/socket.service';
+import { LobbyPlayer } from '../../Data/LobbyPlayer';
+import { RoomConfig, DEFAULT_CONFIG } from '../../Data/RoomConfig';
 
 @Component({
   selector: 'app-lobby',
@@ -11,8 +13,9 @@ import { SocketService } from '../../../services/socket.service';
   styleUrl: './lobby.component.scss'
 })
 export class LobbyComponent implements OnInit, OnDestroy {
-  roomName: string = '';
-  players: string[] = [];
+  roomName = '';
+  players: LobbyPlayer[] = [];
+  config: RoomConfig = { ...DEFAULT_CONFIG };
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -25,8 +28,15 @@ export class LobbyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.socketService.players$.pipe(takeUntil(this.destroy$)).subscribe(players => {
-      this.players = players;
+    this.socketService.lobbyUpdate$.pipe(takeUntil(this.destroy$)).subscribe(update => {
+      this.players = update.players;
+      this.config = { ...update.config };
+    });
+
+    this.socketService.kicked$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.socketService.currentRoom = '';
+      this.socketService.playerId = '';
+      this.router.navigate(['/']);
     });
 
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
@@ -45,16 +55,46 @@ export class LobbyComponent implements OnInit, OnDestroy {
     return this.socketService.playerId;
   }
 
-  get canStart(): boolean {
-    return this.players.length >= 2;
+  get isHost(): boolean {
+    return this.players.length > 0 && this.players[0].id === this.playerId;
   }
 
-  get isHost(): boolean {
-    return this.players.length > 0 && this.players[0] === this.playerId;
+  get canStart(): boolean {
+    return this.players.length >= 2 && this.players.slice(1).every(p => p.ready);
+  }
+
+  get isReady(): boolean {
+    return this.players.find(p => p.id === this.playerId)?.ready ?? false;
+  }
+
+  adjustConfig(field: 'maxPlayers' | 'handSize' | 'lives', delta: number) {
+    if (!this.isHost) return;
+    const limits: Record<string, [number, number]> = {
+      maxPlayers: [2, 5],
+      handSize:   [5, 8],
+      lives:      [1, 3],
+    };
+    const [min, max] = limits[field];
+    (this.config as any)[field] = Math.min(max, Math.max(min, (this.config[field] as number) + delta));
+    this.socketService.setConfig({ ...this.config });
+  }
+
+  toggleRandomBosses() {
+    if (!this.isHost) return;
+    this.config.randomBosses = !this.config.randomBosses;
+    this.socketService.setConfig({ ...this.config });
+  }
+
+  toggleReady() {
+    this.socketService.toggleReady();
+  }
+
+  kickPlayer(targetId: string) {
+    this.socketService.kickPlayer(targetId);
   }
 
   startGame() {
-    this.socketService.startGame(this.roomName);
+    this.socketService.startGame();
   }
 
   leaveRoom() {
