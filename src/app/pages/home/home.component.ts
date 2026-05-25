@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loading = false;
   roomName = '';
   searchQuery = '';
+  tempName = '';
 
   private currentPage = '1';
   private pageSize = '5';
@@ -28,10 +29,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private socketService: SocketService, private router: Router) {}
 
   ngOnInit() {
-    this.socketService.getRooms({ page: this.currentPage, size: this.pageSize });
-    this.socketService.updateRooms$.pipe(takeUntil(this.destroy$)).subscribe(rooms => {
-      this.dataRooms = rooms;
-    });
+    if (this.hasName) {
+      this.loadRooms();
+    }
   }
 
   ngOnDestroy() {
@@ -39,11 +39,39 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // ─── Nombre ───────────────────────────────────────────────────────────────
+
   get playerName(): string {
     return this.socketService.playerName;
   }
-  set playerName(value: string) {
+  private set playerName(value: string) {
     this.socketService.playerName = value;
+  }
+
+  get hasName(): boolean {
+    return this.playerName.length > 0;
+  }
+
+  confirmName() {
+    const trimmed = this.tempName.trim();
+    if (!trimmed) return;
+    this.playerName = trimmed;
+    this.loadRooms();
+  }
+
+  changeName() {
+    this.socketService.playerName = '';
+    this.tempName = '';
+    this.destroy$.next();
+  }
+
+  // ─── Salas ────────────────────────────────────────────────────────────────
+
+  private loadRooms() {
+    this.socketService.getRooms({ page: this.currentPage, size: this.pageSize });
+    this.socketService.updateRooms$.pipe(takeUntil(this.destroy$)).subscribe(rooms => {
+      this.dataRooms = rooms;
+    });
   }
 
   get filteredRooms(): Room[] {
@@ -53,21 +81,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  private guardName(): boolean {
-    if (!this.playerName.trim()) {
-      this.errorMessage = 'Por favor, ingresa tu nombre antes de continuar.';
-      return false;
-    }
-    return true;
-  }
-
   searchRooms() {
     this.socketService.getRooms({ page: '1', size: this.pageSize });
     this.currentPage = '1';
   }
 
   joinRoom() {
-    if (!this.guardName()) return;
     if (!this.roomName.trim()) {
       this.errorMessage = 'Por favor, ingresa el nombre de la sala.';
       return;
@@ -85,7 +104,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   joinRoomByName(name: string) {
-    if (!this.guardName()) return;
     this.loading = true;
     this.errorMessage = '';
     this.socketService.joinRoom(name).subscribe(response => {
@@ -99,7 +117,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   createRoom() {
-    if (!this.guardName()) return;
     if (!this.roomName.trim()) {
       this.errorMessage = 'Por favor, ingresa un nombre para la sala.';
       return;

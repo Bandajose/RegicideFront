@@ -1,16 +1,108 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+// ─── Welcome screen ───────────────────────────────────────────────────────────
+
+.welcome {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #121212, #1e1e1e);
+    color: #fff;
+}
+
+.welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.game-logo {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #ffd54f;
+    text-shadow: 0 2px 12px rgba(255, 213, 79, 0.35);
+}
+
+.welcome-sub {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+    text-align: center;
+}
+
+.welcome-input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s;
+
+    &::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+    &:focus {
+        border-color: rgba(79, 195, 247, 0.55);
+        background: rgba(255, 255, 255, 0.11);
+        box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.14);
+    }
+}
+
+.welcome-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    &:disabled {
+        background: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.3);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
+// ─── Home principal ───────────────────────────────────────────────────────────
 
 .home {
     font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #121212, #1E1E1E);
     color: #fff;
-    overflow: hidden;
+    padding: 24px 0;
 }
 
 .home-inner {
@@ -22,50 +114,51 @@
     max-width: 900px;
 }
 
-// ─── Barra de nombre ──────────────────────────────────────────────────────────
+// ─── Pill de nombre ───────────────────────────────────────────────────────────
 
-.name-bar {
+.name-pill {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    padding: 10px 20px;
-    width: 100%;
-    box-sizing: border-box;
-    animation: fadeIn 0.6s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 50px;
+    padding: 7px 18px;
+    animation: fadeIn 0.4s ease-in-out;
+    align-self: flex-end;
 }
 
-.name-label {
+.name-pill-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.name-pill-value {
     font-size: 13px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.45);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    white-space: nowrap;
+    color: #4fc3f7;
 }
 
-.name-input {
-    flex: 1;
-    max-width: 280px;
-    padding: 7px 12px;
-    margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    font-size: 14px;
+.name-pill-change {
+    font-size: 11px;
     font-weight: 500;
-    text-align: left;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    padding: 3px 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto;
+    max-width: none;
+    box-shadow: none;
 
-    &::placeholder { color: rgba(255, 255, 255, 0.3); }
-
-    &:focus {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(79, 195, 247, 0.5);
-        box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.12);
-        outline: none;
+    &:hover {
+        background: rgba(255, 77, 77, 0.12);
+        border-color: rgba(255, 77, 77, 0.3);
+        color: #ff6b6b;
+        transform: none;
+        box-shadow: none;
     }
 }
 
@@ -167,6 +260,7 @@ button:disabled {
     background: gray;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
 
 .spinner {
@@ -220,16 +314,6 @@ button:disabled {
     background: linear-gradient(135deg, #007bff, #0056b3) !important;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 .room-list {
     margin-top: 20px;
     list-style: none;
@@ -264,18 +348,8 @@ button:disabled {
 .error-message {
     color: #ff4d4d;
     font-size: 14px;
-    display: none;
     margin-top: 5px;
     display: block;
-}
-
-#joinButton {
-    background: #28a745;
-    /* Color verde */
-}
-
-#joinButton:hover {
-    background: #218838;
 }
 
 .pagination {
@@ -294,10 +368,27 @@ button:disabled {
     color: white;
     cursor: pointer;
     transition: 0.3s;
+    width: auto;
+    max-width: none;
+    box-shadow: none;
+}
+
+.pagination button:hover {
+    transform: none;
 }
 
 .pagination button:disabled {
     background: gray;
     cursor: not-allowed;
+    transform: none;
 }
 
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

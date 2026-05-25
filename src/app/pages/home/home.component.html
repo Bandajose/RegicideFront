@@ -1,15 +1,34 @@
-<div class="home">
+<!-- ══════════════════════════════════════════════════════════
+     PANTALLA DE BIENVENIDA  (solo cuando no hay nombre)
+═══════════════════════════════════════════════════════════ -->
+<div class="welcome" *ngIf="!hasName">
+  <div class="welcome-card">
+    <div class="game-logo">♠ Regicide ♠</div>
+    <p class="welcome-sub">¿Cómo quieres que te llamen?</p>
+    <input class="welcome-input"
+           type="text"
+           [(ngModel)]="tempName"
+           placeholder="Tu nombre..."
+           maxlength="20"
+           (keyup.enter)="confirmName()"
+           autofocus />
+    <button class="welcome-btn" [disabled]="!tempName.trim()" (click)="confirmName()">
+      Continuar
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     HOME PRINCIPAL  (una vez el nombre está guardado)
+═══════════════════════════════════════════════════════════ -->
+<div class="home" *ngIf="hasName">
   <div class="home-inner">
 
-    <!-- Nombre del jugador -->
-    <div class="name-bar">
-      <span class="name-label">Tu nombre</span>
-      <input class="name-input"
-             type="text"
-             [(ngModel)]="playerName"
-             placeholder="¿Cómo te llamas?"
-             maxlength="20"
-             (input)="errorMessage = ''" />
+    <!-- Indicador de nombre -->
+    <div class="name-pill">
+      <span class="name-pill-label">Jugando como</span>
+      <span class="name-pill-value">{{ playerName }}</span>
+      <button class="name-pill-change" (click)="changeName()">Cambiar</button>
     </div>
 
     <div class="container-wrapper">
