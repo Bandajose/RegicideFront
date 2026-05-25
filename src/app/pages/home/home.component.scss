@@ -7,19 +7,76 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     background: linear-gradient(135deg, #121212, #1E1E1E);
     color: #fff;
     overflow: hidden;
 }
+
+.home-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 90%;
+    max-width: 900px;
+}
+
+// ─── Barra de nombre ──────────────────────────────────────────────────────────
+
+.name-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.name-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.name-input {
+    flex: 1;
+    max-width: 280px;
+    padding: 7px 12px;
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+
+    &::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+    &:focus {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(79, 195, 247, 0.5);
+        box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.12);
+        outline: none;
+    }
+}
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
 
 .container-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
-    width: 90%;
-    max-width: 900px;
+    width: 100%;
 }
 
 .left-container, .right-container {

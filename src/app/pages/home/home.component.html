@@ -1,52 +1,66 @@
 <div class="home">
-  <div class="container-wrapper">
+  <div class="home-inner">
 
-    <div class="container left-container">
-      <h2>Sala</h2>
-
-      <div class="input-container">
-        <input type="text" [(ngModel)]="roomName" placeholder="Nombre de la sala" />
-        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-      </div>
-
-      <div class="button-container">
-        <button (click)="joinRoom()" [disabled]="loading">
-          <span *ngIf="!loading">🔑 Unirse</span>
-          <div *ngIf="loading" class="spinner"></div>
-        </button>
-      </div>
-
-      <div class="button-container">
-        <button class="btn-primary" (click)="createRoom()" [disabled]="loading">
-          ➕ Crear Sala
-        </button>
-      </div>
+    <!-- Nombre del jugador -->
+    <div class="name-bar">
+      <span class="name-label">Tu nombre</span>
+      <input class="name-input"
+             type="text"
+             [(ngModel)]="playerName"
+             placeholder="¿Cómo te llamas?"
+             maxlength="20"
+             (input)="errorMessage = ''" />
     </div>
 
-    <div class="container right-container">
-      <h2>📋 Salas Disponibles</h2>
+    <div class="container-wrapper">
 
-      <div class="search-container">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Filtrar salas..." />
-        <button class="btn-search" (click)="searchRooms()">🔍</button>
+      <div class="container left-container">
+        <h2>Sala</h2>
+
+        <div class="input-container">
+          <input type="text" [(ngModel)]="roomName" placeholder="Nombre de la sala" />
+          <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+        </div>
+
+        <div class="button-container">
+          <button (click)="joinRoom()" [disabled]="loading">
+            <span *ngIf="!loading">Unirse</span>
+            <div *ngIf="loading" class="spinner"></div>
+          </button>
+        </div>
+
+        <div class="button-container">
+          <button class="btn-primary" (click)="createRoom()" [disabled]="loading">
+            Crear Sala
+          </button>
+        </div>
       </div>
 
-      <ul class="room-list">
-        <li *ngFor="let room of filteredRooms" (click)="joinRoomByName(room.roomName)">
-          🎮 <span class="room-name">{{ room.roomName }}</span>
-          <span class="room-players">👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}</span>
-        </li>
-        <li *ngIf="filteredRooms.length === 0" class="empty">
-          Sin salas disponibles
-        </li>
-      </ul>
+      <div class="container right-container">
+        <h2>Salas Disponibles</h2>
 
-      <div class="pagination">
-        <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
-        <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
-        <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
+        <div class="search-container">
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Filtrar salas..." />
+          <button class="btn-search" (click)="searchRooms()">🔍</button>
+        </div>
+
+        <ul class="room-list">
+          <li *ngFor="let room of filteredRooms" (click)="joinRoomByName(room.roomName)">
+            <span class="room-name">{{ room.roomName }}</span>
+            <span class="room-players">👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}</span>
+          </li>
+          <li *ngIf="filteredRooms.length === 0" class="empty">
+            Sin salas disponibles
+          </li>
+        </ul>
+
+        <div class="pagination">
+          <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
+          <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
+          <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
+        </div>
       </div>
+
     </div>
-
   </div>
 </div>

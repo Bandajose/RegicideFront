@@ -17,7 +17,7 @@
       <div class="player" *ngFor="let p of board.players" [class.active-turn]="p.id === board.playerTurn">
         <div class="player-avatar">{{ p.id === playerId ? '👤' : '🎮' }}</div>
         <div class="player-info">
-          <span class="player-name">{{ p.id === playerId ? 'Tú' : shortId(p.id) }}</span>
+          <span class="player-name">{{ p.id === playerId ? 'Tú' : p.name }}</span>
           <span class="player-cards">🃏 {{ p.cardCount }} cartas</span>
         </div>
         <span class="turn-dot" *ngIf="p.id === board.playerTurn">●</span>
@@ -43,7 +43,7 @@
         <strong>{{ board.playerPhase === 'attack' ? 'Selecciona cartas para atacar' : 'Selecciona cartas para defender' }}</strong>
       </ng-container>
       <ng-container *ngIf="!isMyTurn">
-        ⏳ Turno de <strong>{{ shortId(board.playerTurn) }}</strong>
+        ⏳ Turno de <strong>{{ nameOf(board.playerTurn) }}</strong>
       </ng-container>
     </div>
 

@@ -73,8 +73,8 @@ export class GameComponent implements OnInit, OnDestroy {
 
   // ─── Helpers de presentación ──────────────────────────────────────────
 
-  shortId(id: string): string {
-    return id ? id.slice(0, 6) + '…' : '';
+  nameOf(id: string): string {
+    return this.board?.players.find(p => p.id === id)?.name ?? id.slice(0, 6) + '…';
   }
 
   isRed(suit: string): boolean {

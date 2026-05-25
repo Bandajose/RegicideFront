@@ -20,6 +20,13 @@ export class SocketService {
   currentRoom = '';
   playerId = '';
 
+  get playerName(): string {
+    return localStorage.getItem('playerName') ?? '';
+  }
+  set playerName(name: string) {
+    localStorage.setItem('playerName', name.trim());
+  }
+
   readonly updateRooms$: Observable<RoomResponse>;
   readonly lobbyUpdate$: Observable<LobbyUpdate>;
   readonly boardStatus$: Observable<Board>;
@@ -60,7 +67,7 @@ export class SocketService {
 
   joinRoom(roomName: string): Observable<any> {
     return new Observable(observer => {
-      this.socket.emit('joinRoom', roomName, (response: any) => {
+      this.socket.emit('joinRoom', { roomName, playerName: this.playerName }, (response: any) => {
         if (response?.success) {
           this.currentRoom = roomName;
           this.playerId = response.playerId;

@@ -60,7 +60,7 @@
             [class.you]="player.id === playerId">
           <span class="player-icon">{{ i === 0 ? '👑' : '🎮' }}</span>
           <span class="player-name">
-            {{ player.id === playerId ? 'Tú' : 'Jugador ' + (i + 1) }}
+            {{ player.id === playerId ? 'Tú (' + player.name + ')' : player.name }}
           </span>
           <span class="host-badge" *ngIf="i === 0">Anfitrión</span>
           <span class="ready-badge" *ngIf="i > 0" [class.ready]="player.ready">

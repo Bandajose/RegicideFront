@@ -16,13 +16,13 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dataRooms: RoomResponse = { rooms: [], totalRooms: '0', totalPages: '1', currentPage: '1' };
-  errorMessage: string = '';
-  loading: boolean = false;
-  roomName: string = '';
-  searchQuery: string = '';
+  errorMessage = '';
+  loading = false;
+  roomName = '';
+  searchQuery = '';
 
-  private currentPage: string = '1';
-  private pageSize: string = '5';
+  private currentPage = '1';
+  private pageSize = '5';
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -39,11 +39,26 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get playerName(): string {
+    return this.socketService.playerName;
+  }
+  set playerName(value: string) {
+    this.socketService.playerName = value;
+  }
+
   get filteredRooms(): Room[] {
     if (!this.searchQuery.trim()) return this.dataRooms.rooms;
     return this.dataRooms.rooms.filter(r =>
       r.roomName.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
+  }
+
+  private guardName(): boolean {
+    if (!this.playerName.trim()) {
+      this.errorMessage = 'Por favor, ingresa tu nombre antes de continuar.';
+      return false;
+    }
+    return true;
   }
 
   searchRooms() {
@@ -52,6 +67,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   joinRoom() {
+    if (!this.guardName()) return;
     if (!this.roomName.trim()) {
       this.errorMessage = 'Por favor, ingresa el nombre de la sala.';
       return;
@@ -69,6 +85,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   joinRoomByName(name: string) {
+    if (!this.guardName()) return;
     this.loading = true;
     this.errorMessage = '';
     this.socketService.joinRoom(name).subscribe(response => {
@@ -82,6 +99,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   createRoom() {
+    if (!this.guardName()) return;
     if (!this.roomName.trim()) {
       this.errorMessage = 'Por favor, ingresa un nombre para la sala.';
       return;
