@@ -51,7 +51,8 @@ export class SocketService {
   readonly rejoinFailed$: Observable<void>;
 
   constructor() {
-    this.socket = io('http://localhost:3000/');
+    // this.socket = io('http://localhost:3000/'); --Dev
+    this.socket = io('https://two1gamebackend.onrender.com/'); //Prod
     this.updateRooms$   = this.listen<RoomResponse>('updateRooms');
     this.lobbyUpdate$   = this.listen<LobbyUpdate>('updateLobby');
     this.boardStatus$   = this.listen<Board>('boardStatus');
