@@ -1,394 +1,509 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-// ─── Welcome screen ───────────────────────────────────────────────────────────
+$bg:        #111;
+$surface:   #1a1a1a;
+$surface2:  #222;
+$border:    rgba(255,255,255,0.08);
+$gold:      #ffd54f;
+$blue:      #4fc3f7;
+$green:     #43a047;
+$red:       #e53935;
+$text:      #f0f0f0;
+$muted:     rgba(255,255,255,0.4);
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+// ─── WELCOME ──────────────────────────────────────────────────────────────────
 
 .welcome {
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #121212, #1e1e1e);
-    color: #fff;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
 }
 
 .welcome-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 48px 40px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 90%;
+  max-width: 380px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 20px;
+  padding: 44px 36px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  animation: fadeUp 0.5s ease;
 }
 
-.game-logo {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: #ffd54f;
-    text-shadow: 0 2px 12px rgba(255, 213, 79, 0.35);
+.welcome-suits {
+  font-size: 22px;
+  letter-spacing: 10px;
+  color: $gold;
+  opacity: 0.7;
+}
+
+.welcome-title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: $gold;
+  text-shadow: 0 0 24px rgba(255,213,79,0.4);
 }
 
 .welcome-sub {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.55);
-    margin: 0;
-    text-align: center;
+  font-size: 13px;
+  color: $muted;
+}
+
+.welcome-divider {
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, $gold, transparent);
+  border-radius: 2px;
+}
+
+.welcome-prompt {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
 }
 
 .welcome-input {
-    width: 100%;
-    padding: 13px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.2s;
+  width: 100%;
+  padding: 12px 16px;
+  background: $surface2;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: $text;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
-    &::placeholder { color: rgba(255, 255, 255, 0.3); }
-
-    &:focus {
-        border-color: rgba(79, 195, 247, 0.55);
-        background: rgba(255, 255, 255, 0.11);
-        box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.14);
-    }
+  &::placeholder { color: rgba(255,255,255,0.25); }
+  &:focus {
+    border-color: rgba($blue, 0.5);
+    box-shadow: 0 0 0 3px rgba($blue, 0.12);
+  }
 }
 
 .welcome-btn {
-    width: 100%;
-    padding: 13px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: #fff;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: #fff;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 
-    &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-    }
-
-    &:disabled {
-        background: rgba(255, 255, 255, 0.12);
-        color: rgba(255, 255, 255, 0.3);
-        cursor: not-allowed;
-        box-shadow: none;
-    }
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+  &:disabled {
+    background: $surface2;
+    color: rgba(255,255,255,0.2);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 }
 
-// ─── Home principal ───────────────────────────────────────────────────────────
+// ─── HOME LAYOUT ──────────────────────────────────────────────────────────────
 
 .home {
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #121212, #1E1E1E);
-    color: #fff;
-    padding: 24px 0;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+  display: flex;
+  flex-direction: column;
 }
 
-.home-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 90%;
-    max-width: 900px;
+// ─── HEADER ───────────────────────────────────────────────────────────────────
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  background: $surface;
+  border-bottom: 1px solid $border;
+  flex-shrink: 0;
 }
 
-// ─── Pill de nombre ───────────────────────────────────────────────────────────
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: $gold;
+  text-shadow: 0 0 16px rgba(255,213,79,0.35);
+}
+
+.brand-suits {
+  font-size: 16px;
+  color: $gold;
+  opacity: 0.55;
+  letter-spacing: 2px;
+}
 
 .name-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    border-radius: 50px;
-    padding: 7px 18px;
-    animation: fadeIn 0.4s ease-in-out;
-    align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $surface2;
+  border: 1px solid $border;
+  border-radius: 50px;
+  padding: 6px 14px 6px 8px;
 }
 
-.name-pill-label {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.38);
+.name-pill-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
 }
 
 .name-pill-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: #4fc3f7;
+  font-size: 13px;
+  font-weight: 600;
+  color: $blue;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .name-pill-change {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 20px;
-    color: rgba(255, 255, 255, 0.45);
-    cursor: pointer;
-    transition: all 0.2s;
-    width: auto;
-    max-width: none;
-    box-shadow: none;
+  font-size: 11px;
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  color: $muted;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
 
-    &:hover {
-        background: rgba(255, 77, 77, 0.12);
-        border-color: rgba(255, 77, 77, 0.3);
-        color: #ff6b6b;
-        transform: none;
-        box-shadow: none;
-    }
+  &:hover {
+    background: rgba($red, 0.1);
+    border-color: rgba($red, 0.3);
+    color: #ff6b6b;
+  }
 }
 
-// ─── Layout ───────────────────────────────────────────────────────────────────
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
 
-.container-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 20px;
-    width: 100%;
+.home-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  padding: 28px 32px;
 }
 
-.left-container, .right-container {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    animation: fadeIn 0.8s ease-in-out;
-    min-height: 300px;
-}
-.right-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+// ─── PANELS ───────────────────────────────────────────────────────────────────
+
+.panel {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.4s ease;
 }
 
-.container {
-    width: 90%;
-    max-width: 450px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    animation: fadeIn 0.8s ease-in-out;
+.panel-left  { width: 320px; flex-shrink: 0; }
+.panel-right { flex: 1; max-width: 480px; }
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }
 
-h2 {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 15px;
+// ─── LEFT PANEL ───────────────────────────────────────────────────────────────
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.button-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 15px;
+.field-label {
+  font-size: 12px;
+  color: $muted;
+  font-weight: 500;
 }
 
-input {
-    width: 100%;
-    max-width: 350px;
-    padding: 12px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
-    outline: none;
-    transition: all 0.3s ease;
-}
+.field input,
+.panel-left input {
+  width: 100%;
+  padding: 11px 14px;
+  background: $surface2;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: $text;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
-input:focus {
-    background: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-}
-
-button {
-    width: 100%;
-    max-width: 350px;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: #fff;
-    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 3px 6px 15px rgba(0, 0, 0, 0.3);
-}
-
-button:disabled {
-    background: gray;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-.spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.4);
-    border-top: 3px solid #fff;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-}
-
-.search-container {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 8px;
-
-    input {
-        flex: 1;
-        max-width: 270px;
-        margin: 0;
-    }
-
-    .btn-search {
-        width: auto;
-        padding: 10px 14px;
-        background: #007bff;
-    }
-}
-
-.room-name {
-    flex: 1;
-    text-align: left;
-}
-
-.room-players {
-    font-size: 14px;
-    opacity: 0.8;
-}
-
-.room-list .empty {
-    color: rgba(255, 255, 255, 0.5);
-    font-style: italic;
-    cursor: default;
-    background: transparent;
-    &:hover { background: transparent; transform: none; }
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #007bff, #0056b3) !important;
-}
-
-.room-list {
-    margin-top: 20px;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.room-list li {
-    width: 100%;
-    max-width: 350px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 6px 0;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s ease;
-}
-
-.room-list li:hover {
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(1.05);
+  &::placeholder { color: rgba(255,255,255,0.2); }
+  &:focus {
+    border-color: rgba($blue, 0.45);
+    box-shadow: 0 0 0 3px rgba($blue, 0.1);
+  }
 }
 
 .error-message {
-    color: #ff4d4d;
-    font-size: 14px;
-    margin-top: 5px;
-    display: block;
+  font-size: 12px;
+  color: #ff6b6b;
+  background: rgba(255,77,77,0.08);
+  border: 1px solid rgba(255,77,77,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-join,
+.btn-create {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  &:hover:not(:disabled) { transform: translateY(-2px); }
+}
+
+.btn-join {
+  background: transparent;
+  color: $blue;
+  border: 1.5px solid rgba($blue, 0.5);
+
+  &:hover:not(:disabled) {
+    background: rgba($blue, 0.1);
+    border-color: $blue;
+    box-shadow: 0 4px 16px rgba($blue, 0.15);
+  }
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+}
+
+.panel-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin: 0 auto;
+}
+
+// ─── RIGHT PANEL ──────────────────────────────────────────────────────────────
+
+.panel-right-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $surface2;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 6px 10px;
+  flex: 1;
+  max-width: 180px;
+
+  .search-icon { font-size: 13px; flex-shrink: 0; }
+
+  input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: $text;
+    width: 100%;
+
+    &::placeholder { color: rgba(255,255,255,0.25); }
+  }
+}
+
+.room-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.room-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: $surface2;
+  border: 1px solid $border;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s;
+
+  &:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba($blue, 0.3);
+    transform: translateX(3px);
+  }
+}
+
+.room-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.room-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-item-count {
+  font-size: 12px;
+  color: $muted;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.room-item-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.room-item-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $blue, #81d4fa);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.room-empty {
+  text-align: center;
+  padding: 32px 0;
+  color: rgba(255,255,255,0.2);
+  font-size: 14px;
+  font-style: italic;
 }
 
 .pagination {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 4px;
 }
 
-.pagination button {
-    padding: 8px 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-    width: auto;
-    max-width: none;
-    box-shadow: none;
+.pg-btn {
+  width: 32px;
+  height: 32px;
+  background: $surface2;
+  border: 1px solid $border;
+  border-radius: 8px;
+  color: $muted;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+
+  &:hover:not(:disabled) {
+    background: rgba($blue, 0.12);
+    border-color: rgba($blue, 0.35);
+    color: $blue;
+  }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
 }
 
-.pagination button:hover {
-    transform: none;
+.pg-info {
+  font-size: 13px;
+  color: $muted;
+  min-width: 48px;
+  text-align: center;
 }
 
-.pagination button:disabled {
-    background: gray;
-    cursor: not-allowed;
-    transform: none;
+// ─── ANIMACIONES ──────────────────────────────────────────────────────────────
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-12px); }
-    to   { opacity: 1; transform: translateY(0); }
+  to { transform: rotate(360deg); }
 }

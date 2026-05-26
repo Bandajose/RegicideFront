@@ -1,10 +1,11 @@
-<!-- ══════════════════════════════════════════════════════════
-     PANTALLA DE BIENVENIDA  (solo cuando no hay nombre)
-═══════════════════════════════════════════════════════════ -->
+<!-- ─── PANTALLA DE BIENVENIDA ────────────────────────────────────────────── -->
 <div class="welcome" *ngIf="!hasName">
   <div class="welcome-card">
-    <div class="game-logo">♠ Regicide ♠</div>
-    <p class="welcome-sub">¿Cómo quieres que te llamen?</p>
+    <div class="welcome-suits">♠ ♥ ♦ ♣</div>
+    <h1 class="welcome-title">Regicide</h1>
+    <p class="welcome-sub">Un juego cooperativo de cartas</p>
+    <div class="welcome-divider"></div>
+    <p class="welcome-prompt">¿Cómo quieres que te llamen?</p>
     <input class="welcome-input"
            type="text"
            [(ngModel)]="tempName"
@@ -13,73 +14,89 @@
            (keyup.enter)="confirmName()"
            autofocus />
     <button class="welcome-btn" [disabled]="!tempName.trim()" (click)="confirmName()">
-      Continuar
+      Entrar al juego
     </button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     HOME PRINCIPAL  (una vez el nombre está guardado)
-═══════════════════════════════════════════════════════════ -->
+<!-- ─── HOME PRINCIPAL ────────────────────────────────────────────────────── -->
 <div class="home" *ngIf="hasName">
-  <div class="home-inner">
 
-    <!-- Indicador de nombre -->
+  <header class="home-header">
+    <div class="brand">
+      <span class="brand-suits">♠♥</span>
+      <span class="brand-name">Regicide</span>
+      <span class="brand-suits">♦♣</span>
+    </div>
     <div class="name-pill">
-      <span class="name-pill-label">Jugando como</span>
+      <span class="name-pill-avatar">{{ playerName[0]?.toUpperCase() }}</span>
       <span class="name-pill-value">{{ playerName }}</span>
       <button class="name-pill-change" (click)="changeName()">Cambiar</button>
     </div>
+  </header>
 
-    <div class="container-wrapper">
+  <main class="home-main">
 
-      <div class="container left-container">
-        <h2>Sala</h2>
+    <!-- Panel izquierdo: Unirse / Crear -->
+    <section class="panel panel-left">
+      <h2 class="panel-title">Unirse a una sala</h2>
 
-        <div class="input-container">
-          <input type="text" [(ngModel)]="roomName" placeholder="Nombre de la sala" />
-          <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-        </div>
+      <div class="field">
+        <label class="field-label">Nombre de la sala</label>
+        <input type="text" [(ngModel)]="roomName" placeholder="Ej: partida-de-juan" />
+      </div>
 
-        <div class="button-container">
-          <button (click)="joinRoom()" [disabled]="loading">
-            <span *ngIf="!loading">Unirse</span>
-            <div *ngIf="loading" class="spinner"></div>
-          </button>
-        </div>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-        <div class="button-container">
-          <button class="btn-primary" (click)="createRoom()" [disabled]="loading">
-            Crear Sala
-          </button>
+      <div class="action-buttons">
+        <button class="btn-join" (click)="joinRoom()" [disabled]="loading">
+          <span *ngIf="!loading">Unirse</span>
+          <div *ngIf="loading" class="spinner"></div>
+        </button>
+        <button class="btn-create" (click)="createRoom()" [disabled]="loading">
+          Crear Sala
+        </button>
+      </div>
+
+      <p class="panel-hint">Ingresa el nombre exacto para unirte, o crea una sala nueva.</p>
+    </section>
+
+    <!-- Panel derecho: Lista de salas -->
+    <section class="panel panel-right">
+      <div class="panel-right-header">
+        <h2 class="panel-title">Salas disponibles</h2>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Filtrar..." />
         </div>
       </div>
 
-      <div class="container right-container">
-        <h2>Salas Disponibles</h2>
+      <ul class="room-list">
+        <li class="room-item" *ngFor="let room of filteredRooms"
+            (click)="joinRoomByName(room.roomName)">
+          <div class="room-item-top">
+            <span class="room-item-name">{{ room.roomName }}</span>
+            <span class="room-item-count">{{ room.playerNumber }}/{{ room.maxPlayerNumber }}</span>
+          </div>
+          <div class="room-item-bar">
+            <div class="room-item-fill"
+                 [style.width.%]="(+room.playerNumber / +room.maxPlayerNumber) * 100">
+            </div>
+          </div>
+        </li>
+        <li class="room-empty" *ngIf="filteredRooms.length === 0">
+          Sin salas disponibles
+        </li>
+      </ul>
 
-        <div class="search-container">
-          <input type="text" [(ngModel)]="searchQuery" placeholder="Filtrar salas..." />
-          <button class="btn-search" (click)="searchRooms()">🔍</button>
-        </div>
-
-        <ul class="room-list">
-          <li *ngFor="let room of filteredRooms" (click)="joinRoomByName(room.roomName)">
-            <span class="room-name">{{ room.roomName }}</span>
-            <span class="room-players">👥 {{ room.playerNumber }}/{{ room.maxPlayerNumber }}</span>
-          </li>
-          <li *ngIf="filteredRooms.length === 0" class="empty">
-            Sin salas disponibles
-          </li>
-        </ul>
-
-        <div class="pagination">
-          <button (click)="prevPage()" [disabled]="dataRooms.currentPage === '1'">◀</button>
-          <span>Página {{ dataRooms.currentPage }} de {{ dataRooms.totalPages }}</span>
-          <button (click)="nextPage()" [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
-        </div>
+      <div class="pagination">
+        <button class="pg-btn" (click)="prevPage()"
+                [disabled]="dataRooms.currentPage === '1'">◀</button>
+        <span class="pg-info">{{ dataRooms.currentPage }} / {{ dataRooms.totalPages }}</span>
+        <button class="pg-btn" (click)="nextPage()"
+                [disabled]="dataRooms.currentPage === dataRooms.totalPages">▶</button>
       </div>
+    </section>
 
-    </div>
-  </div>
+  </main>
 </div>
