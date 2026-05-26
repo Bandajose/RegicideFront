@@ -154,4 +154,13 @@ export class SocketService {
       cards,
     });
   }
+
+  claimJokerTurn(): void {
+    this.socket.emit('playTurn', {
+      roomName: this.currentRoom,
+      playerId: this.playerId,
+      action: 'Joker',
+      cards: [],
+    });
+  }
 }

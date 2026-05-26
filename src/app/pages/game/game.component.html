@@ -55,20 +55,45 @@
   <div class="main-area">
 
     <!-- 1) Banner de turno -->
-    <div class="turn-banner" [class.my-turn]="isMyTurn">
-      <ng-container *ngIf="isMyTurn">
-        <span class="turn-icon">⚔️</span>
-        <span class="turn-text">Tu turno</span>
-        <span class="phase-badge"
-              [class.phase-attack]="board.playerPhase === 'attack'"
-              [class.phase-defend]="board.playerPhase === 'defend'">
-          {{ board.playerPhase === 'attack' ? '⚔️ Atacar' : '🛡️ Defender' }}
-        </span>
+    <div class="turn-banner"
+         [class.my-turn]="isMyTurn && board.playerPhase !== 'Joker'"
+         [class.joker-phase]="board.playerPhase === 'Joker'">
+
+      <!-- Fase Joker: yo lo jugué -->
+      <ng-container *ngIf="board.playerPhase === 'Joker' && isMyTurn">
+        <span class="turn-icon">🃏</span>
+        <span class="turn-text">Joker jugado — otro jugador puede tomar el turno</span>
       </ng-container>
-      <ng-container *ngIf="!isMyTurn">
-        <span class="turn-icon">⏳</span>
-        <span class="turn-text">Turno de <strong>{{ nameOf(board.playerTurn) }}</strong></span>
+
+      <!-- Fase Joker: otro jugador puede reclamar -->
+      <ng-container *ngIf="board.playerPhase === 'Joker' && !isMyTurn">
+        <span class="turn-icon">🃏</span>
+        <span class="turn-text">¡<strong>Joker activo</strong>! Puedes tomar el turno</span>
       </ng-container>
+
+      <!-- Turno normal -->
+      <ng-container *ngIf="board.playerPhase !== 'Joker'">
+        <ng-container *ngIf="isMyTurn">
+          <span class="turn-icon">⚔️</span>
+          <span class="turn-text">Tu turno</span>
+          <span class="phase-badge"
+                [class.phase-attack]="board.playerPhase === 'attack'"
+                [class.phase-defend]="board.playerPhase === 'defend'">
+            {{ board.playerPhase === 'attack' ? '⚔️ Atacar' : '🛡️ Defender' }}
+          </span>
+        </ng-container>
+        <ng-container *ngIf="!isMyTurn">
+          <span class="turn-icon">⏳</span>
+          <span class="turn-text">Turno de <strong>{{ nameOf(board.playerTurn) }}</strong></span>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <!-- Botón de reclamar turno (Joker activo, no es mi turno) -->
+    <div class="joker-claim-zone" *ngIf="canClaimJokerTurn">
+      <button class="btn-claim-joker" (click)="claimJokerTurn()">
+        🃏 Tomar turno
+      </button>
     </div>
 
     <!-- 2) Zona central: cementerio | JEFE | mazo -->
@@ -172,6 +197,7 @@
                [class.joker]="card.suit === 'Joker'"
                [class.selected]="isSelected(card)"
                [class.clickable]="isMyTurn"
+               [class.blocked]="isMyTurn && !canAddToSelection(card)"
                [style.animation-delay.s]="i * 0.15"
                (click)="toggleCard(card)">
             <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
@@ -180,6 +206,11 @@
           </div>
           <span class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</span>
         </div>
+        <button class="btn-pass"
+                *ngIf="isMyTurn && board.playerPhase === 'attack'"
+                (click)="passAttack()">
+          ⏭ Pasar turno
+        </button>
       </div>
 
       <button class="btn btn-attack"

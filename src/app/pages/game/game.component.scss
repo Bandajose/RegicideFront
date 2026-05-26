@@ -189,7 +189,42 @@
     border-color: rgba(79,195,247,0.18);
     animation: banner-pulse 2.5s ease-in-out infinite;
   }
+
+  &.joker-phase {
+    color: #ffd54f;
+    background: rgba(255,193,7,0.06);
+    border-color: rgba(255,193,7,0.28);
+    animation: banner-pulse-joker 2s ease-in-out infinite;
+  }
+
   strong { font-weight: 600; }
+}
+
+.joker-claim-zone {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-claim-joker {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #ffd54f, #ffc107);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 36px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 20px rgba(255,193,7,0.4);
+  animation: float 2s ease-in-out infinite;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(255,193,7,0.55);
+  }
 }
 
 .turn-icon { font-size: 15px; }
@@ -509,6 +544,26 @@
   padding: 20px 30px;
 }
 
+.btn-pass {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 3px 14px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+
+  &:hover {
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.04);
+  }
+}
+
 .btn-defend {
   background: linear-gradient(135deg, #27ae60, #1e8449);
   box-shadow: 0 4px 16px rgba(39,174,96,0.22);
@@ -596,6 +651,13 @@
     box-shadow: 0 0 0 3px #4fc3f7, 0 14px 30px rgba(0,0,0,0.5) !important;
     z-index: 5;
   }
+
+  &.blocked {
+    opacity: 0.3;
+    cursor: not-allowed !important;
+    animation-play-state: paused;
+    filter: grayscale(40%);
+  }
 }
 
 // Reverso de carta (pila mazo/cementerio)
@@ -639,6 +701,11 @@
 @keyframes banner-pulse {
   0%, 100% { border-color: rgba(79,195,247,0.18); box-shadow: none; }
   50%       { border-color: rgba(79,195,247,0.38); box-shadow: 0 0 12px rgba(79,195,247,0.08); }
+}
+
+@keyframes banner-pulse-joker {
+  0%, 100% { border-color: rgba(255,193,7,0.28); box-shadow: none; }
+  50%       { border-color: rgba(255,193,7,0.55); box-shadow: 0 0 16px rgba(255,193,7,0.12); }
 }
 
 // ─── OVERLAY ───────────────────────────────────────────────────────────────
