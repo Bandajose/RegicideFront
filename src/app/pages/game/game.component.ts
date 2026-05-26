@@ -190,9 +190,15 @@ export class GameComponent implements OnInit, OnDestroy {
     if (!this.board) return;
     if (this.board.playerTurn !== this.socketService.playerId) return;
 
-    // Defensa con daño 0: nada que defender, pasar automáticamente
-    if (this.board.playerPhase === 'defend' && this.board.currentBoss.damage === 0) {
-      this.socketService.playTurn('defend', []);
+    if (this.board.playerPhase === 'defend') {
+      const noDamage = this.board.currentBoss.damage === 0;
+      const cantDefend = this.playerDataReceived && this.hand.length === 0 && this.board.currentBoss.damage > 0;
+
+      // Daño 0: nada que defender → pasar
+      // Sin cartas con daño pendiente: no puede defender → backend decide game over
+      if (noDamage || cantDefend) {
+        this.socketService.playTurn('defend', []);
+      }
       return;
     }
 
