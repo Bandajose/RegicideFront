@@ -507,3 +507,65 @@ $muted:     rgba(255,255,255,0.4);
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+// ─── RESPONSIVE MOBILE ────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+
+  // Welcome: ya es responsivo, solo reducir padding en pantallas muy pequeñas
+  .welcome-card {
+    padding: 32px 22px;
+  }
+
+  // Header
+  .home-header {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .brand-name  { font-size: 16px; letter-spacing: 2px; }
+  .brand-suits { font-size: 13px; }
+
+  .name-pill { padding: 5px 10px 5px 6px; gap: 6px; }
+  .name-pill-avatar { width: 24px; height: 24px; font-size: 11px; }
+  .name-pill-value  { font-size: 12px; max-width: 80px; }
+  .name-pill-change { font-size: 10px; padding: 2px 8px; }
+
+  // Main: de dos columnas a una columna
+  .home-main {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .panel-left  { width: 100%; }
+  .panel-right { max-width: 100%; }
+
+  .panel {
+    padding: 18px 16px;
+    gap: 12px;
+  }
+
+  .panel-title { font-size: 13px; }
+
+  // Inputs y botones: ya son 100% de ancho, solo ajustar tamaño de fuente
+  .field input,
+  .panel-left input { font-size: 13px; padding: 10px 12px; }
+
+  .btn-join,
+  .btn-create { font-size: 13px; padding: 11px; }
+
+  // Panel derecho: header con search box compacto
+  .panel-right-header { flex-wrap: wrap; gap: 8px; }
+  .search-box { max-width: 100%; }
+
+  .room-item { padding: 10px 12px; }
+  .room-item-name { font-size: 13px; }
+  .room-item-count { font-size: 11px; }
+
+  .room-empty { padding: 20px 0; font-size: 13px; }
+
+  .pg-btn  { width: 36px; height: 36px; }
+  .pg-info { font-size: 12px; }
+}

@@ -870,3 +870,203 @@
   72%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
 }
+
+// ─── RESPONSIVE MOBILE ─────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+
+  // Contenedor raíz: columna única, altura dinámica
+  .game-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    padding: 6px;
+    gap: 6px;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  // ── Sidebar → barra horizontal superior ───────────────────────────────────
+
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 10px;
+    gap: 6px;
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+
+  .sidebar-section-label { display: none; }
+  .sidebar-stats         { display: none; }
+
+  .panel {
+    padding: 5px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .player-list {
+    flex-direction: row;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: visible;
+    gap: 4px;
+  }
+
+  .player {
+    flex-direction: row;
+    padding: 4px 8px;
+    flex-shrink: 0;
+  }
+
+  .player-avatar { font-size: 14px; }
+  .player-name   { font-size: 11px; }
+  .player-cards  { font-size: 9px;  }
+
+  .btn-leave {
+    padding: 5px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  // ── Main area ─────────────────────────────────────────────────────────────
+
+  .main-area {
+    padding: 8px 10px;
+    gap: 4px;
+    overflow-y: auto;
+  }
+
+  // ── Turn banner ───────────────────────────────────────────────────────────
+
+  .turn-banner  { padding: 5px 12px; }
+  .turn-icon    { font-size: 13px; }
+  .turn-text    { font-size: 11px; }
+  .phase-badge  { font-size: 9px; padding: 1px 8px; }
+
+  .btn-claim-joker { padding: 8px 28px; font-size: 13px; }
+
+  // ── Zona central ──────────────────────────────────────────────────────────
+
+  .center-zone {
+    flex: none;
+    gap: 10px;
+  }
+
+  .boss-card {
+    width: 107px;
+    height: 155px;
+  }
+
+  .boss-main-value { font-size: 32px; }
+  .boss-watermark  { font-size: 64px; }
+  .boss-badge      { font-size: 9px; padding: 2px 8px; }
+  .boss-stats      { padding: 5px 10px; gap: 4px; }
+  .boss-stat-item  { font-size: 12px; span { font-size: 13px; } }
+  .boss-effect     { font-size: 9px; }
+
+  .pile-zone { gap: 4px; }
+
+  .pile-stack {
+    width: 54px;
+    height: 78px;
+    .card-back { width: 54px; height: 78px; }
+  }
+
+  .pile-empty  { width: 54px; height: 78px; }
+  .pile-label  { font-size: 8px; letter-spacing: 1px; }
+  .pile-count  { font-size: 12px; }
+
+  // ── Mesa ──────────────────────────────────────────────────────────────────
+
+  .table-panel { padding: 6px 10px; min-height: 34px; }
+  .zone-label  { font-size: 9px; }
+
+  .table-card {
+    width: 50px;
+    height: 72px;
+    .suit-center { font-size: 18px; }
+    .corner      { font-size: 7px;  }
+  }
+
+  // ── Hand info ─────────────────────────────────────────────────────────────
+
+  .hand-info-row {
+    height: 22px;
+    margin-bottom: 20px;
+    margin-top: auto;
+  }
+
+  .hand-info { font-size: 9px; padding: 2px 8px; }
+
+  // ── Contenedor de mano: cartas arriba, botones abajo en fila ──────────────
+
+  .hand-container {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .hand-area {
+    order: 0;
+    width: 100%;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .btn-defend { order: 1; flex: 1; }
+  .btn-attack { order: 2; flex: 1; }
+
+  // ── Cartas de la mano: centradas o scroll horizontal ──────────────────────
+
+  .hand-cards {
+    flex-wrap: nowrap;
+    width: max-content;
+    margin: 0 auto;
+    gap: 5px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hand-card {
+    width: 71px;
+    height: 103px;
+    flex-shrink: 0;
+
+    .suit-center { font-size: 22px; }
+    .corner      { font-size: 8px;  }
+
+    &.selected {
+      transform: translateY(-14px);
+      box-shadow: 0 0 0 3px #4fc3f7, 0 10px 24px rgba(0,0,0,0.5) !important;
+    }
+
+    &.clickable:hover:not(.selected) {
+      transform: translateY(-6px) scale(1.04) !important;
+    }
+  }
+
+  .btn-pass {
+    font-size: 10px;
+    padding: 4px 12px;
+    margin-top: 2px;
+  }
+
+  .empty-hand { font-size: 11px; padding: 12px 16px; }
+
+  .btn { padding: 10px 12px; font-size: 12px; }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+
+  .turn-toast {
+    font-size: 15px;
+    padding: 12px 24px;
+    border-radius: 14px;
+    gap: 8px;
+  }
+
+  .toast-icon { font-size: 18px; }
+}
