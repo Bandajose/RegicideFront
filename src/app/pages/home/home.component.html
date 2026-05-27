@@ -29,7 +29,7 @@
       <span class="brand-suits">♦♣</span>
     </div>
     <div class="name-pill">
-      <span class="name-pill-avatar">{{ playerName[0]?.toUpperCase() }}</span>
+      <span class="name-pill-avatar">{{ playerName.charAt(0).toUpperCase() }}</span>
       <span class="name-pill-value">{{ playerName }}</span>
       <button class="name-pill-change" (click)="changeName()">Cambiar</button>
     </div>
