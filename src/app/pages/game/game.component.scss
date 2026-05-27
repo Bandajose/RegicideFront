@@ -722,6 +722,59 @@
   backdrop-filter: blur(4px);
 }
 
+.disconnect-overlay {
+  background: rgba(0,0,0,0.72);
+}
+
+.disconnect-box {
+  background: linear-gradient(160deg, #1e1e1e, #161616);
+  border: 1px solid rgba(255,193,7,0.22);
+  border-radius: 20px;
+  padding: 40px 52px;
+  text-align: center;
+
+  .disconnect-icon { font-size: 48px; margin-bottom: 12px; }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffd54f;
+    margin-bottom: 6px;
+  }
+
+  p {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    margin-bottom: 20px;
+    strong { color: #fff; }
+  }
+}
+
+.countdown-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,193,7,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  box-shadow: 0 0 20px rgba(255,193,7,0.1);
+}
+
+.countdown-number {
+  font-size: 30px;
+  font-weight: 700;
+  color: #ffd54f;
+}
+
+.countdown-text {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+  margin-bottom: 0 !important;
+}
+
 .overlay-box {
   background: linear-gradient(160deg, #1e1e1e, #161616);
   border: 1px solid rgba(255,255,255,0.08);

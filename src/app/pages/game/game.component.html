@@ -1,11 +1,31 @@
 <div class="game-container" *ngIf="board; else loadingTpl">
 
+  <!-- ── OVERLAY DESCONEXIÓN ── -->
+  <div class="overlay disconnect-overlay" *ngIf="disconnectedPlayer && !board.endGame">
+    <div class="disconnect-box">
+      <div class="disconnect-icon">⚠️</div>
+      <h2>Jugador desconectado</h2>
+      <p><strong>{{ disconnectedPlayer }}</strong> se ha desconectado</p>
+      <div class="countdown-ring">
+        <span class="countdown-number">{{ disconnectCountdown }}</span>
+      </div>
+      <p class="countdown-text">Esperando reconexión...</p>
+    </div>
+  </div>
+
   <!-- ── OVERLAY FIN DE PARTIDA ── -->
   <div class="overlay" *ngIf="board.endGame">
     <div class="overlay-box">
-      <div class="overlay-icon">{{ board.winGame ? '🏆' : '💀' }}</div>
-      <h1>{{ board.winGame ? '¡Ganaron!' : 'Han perdido' }}</h1>
-      <p>{{ board.winGame ? 'Derrotaron a todos los jefes.' : 'El jefe hizo demasiado daño.' }}</p>
+      <ng-container *ngIf="playerLeftName; else normalEnd">
+        <div class="overlay-icon">🚪</div>
+        <h1>Partida terminada</h1>
+        <p><strong>{{ playerLeftName }}</strong> abandonó la partida.</p>
+      </ng-container>
+      <ng-template #normalEnd>
+        <div class="overlay-icon">{{ board.winGame ? '🏆' : '💀' }}</div>
+        <h1>{{ board.winGame ? '¡Ganaron!' : 'Han perdido' }}</h1>
+        <p>{{ board.winGame ? 'Derrotaron a todos los jefes.' : 'El jefe hizo demasiado daño.' }}</p>
+      </ng-template>
       <button (click)="leaveGame()">Volver al Inicio</button>
     </div>
   </div>

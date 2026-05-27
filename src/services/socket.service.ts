@@ -49,6 +49,9 @@ export class SocketService {
   readonly playerData$: Observable<{ hand: any[] }>;
   readonly kicked$: Observable<void>;
   readonly rejoinFailed$: Observable<void>;
+  readonly playerDisconnected$: Observable<{ playerName: string; secondsLeft: number }>;
+  readonly playerReconnected$: Observable<{ playerName: string }>;
+  readonly playerLeft$: Observable<{ playerName: string }>;
 
   constructor() {
     // this.socket = io('http://localhost:3000/'); --Dev
@@ -57,8 +60,11 @@ export class SocketService {
     this.lobbyUpdate$   = this.listen<LobbyUpdate>('updateLobby');
     this.boardStatus$   = this.listen<Board>('boardStatus');
     this.playerData$    = this.listen<{ hand: any[] }>('getPlayerData');
-    this.kicked$        = this.listen<void>('kicked');
-    this.rejoinFailed$  = this.listen<void>('rejoinFailed');
+    this.kicked$               = this.listen<void>('kicked');
+    this.rejoinFailed$         = this.listen<void>('rejoinFailed');
+    this.playerDisconnected$   = this.listen<{ playerName: string; secondsLeft: number }>('playerDisconnected');
+    this.playerReconnected$    = this.listen<{ playerName: string }>('playerReconnected');
+    this.playerLeft$           = this.listen<{ playerName: string }>('playerLeft');
 
     // Al (re)conectar: si hay sala guardada intentar reconectar
     this.socket.on('connect', () => {
@@ -157,6 +163,13 @@ export class SocketService {
 
   claimJokerTurn(): void {
     this.socket.emit('claimJokerTurn', {
+      roomName: this.currentRoom,
+      playerId: this.playerId,
+    });
+  }
+
+  leaveGame(): void {
+    this.socket.emit('leaveGame', {
       roomName: this.currentRoom,
       playerId: this.playerId,
     });

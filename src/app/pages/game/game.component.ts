@@ -17,9 +17,13 @@ export class GameComponent implements OnInit, OnDestroy {
   hand: Card[] = [];
   selectedCards: Card[] = [];
   bossAttacking = false;
+  disconnectedPlayer: string | null = null;
+  disconnectCountdown = 0;
+  playerLeftName: string | null = null;
 
   private lastPhase = '';
   private playerDataReceived = false;
+  private disconnectInterval: ReturnType<typeof setInterval> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -49,12 +53,47 @@ export class GameComponent implements OnInit, OnDestroy {
       this.checkAutoActions();
     });
 
+    this.socketService.playerDisconnected$.pipe(takeUntil(this.destroy$)).subscribe(({ playerName, secondsLeft }) => {
+      this.disconnectedPlayer = playerName;
+      this.disconnectCountdown = secondsLeft;
+      this.startDisconnectCountdown();
+    });
+
+    this.socketService.playerReconnected$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.clearDisconnectState();
+    });
+
+    this.socketService.playerLeft$.pipe(takeUntil(this.destroy$)).subscribe(({ playerName }) => {
+      this.playerLeftName = playerName;
+    });
+
     this.socketService.requestBoardStatus();
   }
 
   ngOnDestroy(): void {
+    this.clearDisconnectState();
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private startDisconnectCountdown(): void {
+    if (this.disconnectInterval) clearInterval(this.disconnectInterval);
+    this.disconnectInterval = setInterval(() => {
+      this.disconnectCountdown--;
+      if (this.disconnectCountdown <= 0) {
+        if (this.disconnectInterval) clearInterval(this.disconnectInterval);
+        this.disconnectInterval = null;
+      }
+    }, 1000);
+  }
+
+  private clearDisconnectState(): void {
+    if (this.disconnectInterval) {
+      clearInterval(this.disconnectInterval);
+      this.disconnectInterval = null;
+    }
+    this.disconnectedPlayer = null;
+    this.disconnectCountdown = 0;
   }
 
   // ─── Getters de conveniencia ───────────────────────────────────────────
@@ -178,6 +217,9 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   leaveGame(): void {
+    if (this.board && !this.board.endGame) {
+      this.socketService.leaveGame();
+    }
     this.socketService.currentRoom = '';
     this.socketService.playerId = '';
     this.router.navigate(['/']);
