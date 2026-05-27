@@ -27,6 +27,19 @@ export class GameComponent implements OnInit, OnDestroy {
     x: number; y: number; dx: string; dy: string; delay: number;
   }> = [];
   frozenTable: Card[] = [];
+
+  historyLog: Array<{
+    cards: Card[];
+    playerName: string;
+    bossDisplay: string;
+    phase: string;
+  }> = [];
+
+  chatMessages: Array<{
+    playerName: string;
+    message: string;
+    isMe: boolean;
+  }> = [];
   disconnectedPlayer: string | null = null;
   disconnectCountdown = 0;
   playerLeftName: string | null = null;
@@ -43,6 +56,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private prevDeckLength = 0;
   private prevBossHealth = 0;
   private prevBossKey = '';
+  private prevBossDisplay = '';
   private flyingCardId = 0;
   private flyingCleanupTimeouts: ReturnType<typeof setTimeout>[] = [];
   private disconnectInterval: ReturnType<typeof setInterval> | null = null;
@@ -75,11 +89,23 @@ export class GameComponent implements OnInit, OnDestroy {
       if (this.prevBossKey === currentBossKey && this.prevBossHealth > 0 && board.currentBoss.health < this.prevBossHealth) {
         this.triggerBossHit();
       }
+      // History: only log when a meaningful phase transition completes
+      const phaseJustChanged =
+        (prevPhase === 'attack' && board.playerPhase === 'defend') ||
+        (prevPhase === 'defend' && board.playerPhase === 'attack') ||
+        (prevPhase === 'attack' && board.playerPhase === 'Joker');
+      if (phaseJustChanged && board.table.length > this.prevTable.length && this.lastTurnId) {
+        const added = board.table.slice(this.prevTable.length);
+        this.addToHistory(added, this.lastTurnId, board, `${board.currentBoss.value}${board.currentBoss.suit}`, prevPhase);
+      }
+
       // Table cards fly to graveyard
       if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
         const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
         if (bossJustDefeated) {
-          // Freeze the cards on screen so the player can see what killed the boss
+          // History: golpe de gracia — usar el jefe que acaba de morir
+          this.addToHistory(this.prevTable, this.lastTurnId, board, this.prevBossDisplay, 'attack');
+          // Freeze the cards so the player can see what killed the boss
           this.frozenTable = this.prevTable;
           const t = setTimeout(() => {
             this.triggerTableDiscard(this.frozenTable);
@@ -98,6 +124,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.lastPhase = board.playerPhase;
       this.prevBossHealth = board.currentBoss.health;
       this.prevBossKey = currentBossKey;
+      this.prevBossDisplay = `${board.currentBoss.value}${board.currentBoss.suit}`;
       this.prevTable = [...board.table];
       this.prevGraveLength = board.grave.length;
       this.prevDeckLength = board.deck.length;
@@ -141,6 +168,12 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.socketService.playerLeft$.pipe(takeUntil(this.destroy$)).subscribe(({ playerName }) => {
       this.playerLeftName = playerName;
+    });
+
+    this.socketService.chatMessage$.pipe(takeUntil(this.destroy$)).subscribe(({ playerName, message }) => {
+      const isMe = playerName === this.socketService.playerName;
+      this.chatMessages.push({ playerName: isMe ? 'Tú' : playerName, message, isMe });
+      if (this.chatMessages.length > 60) this.chatMessages.shift();
     });
 
     this.socketService.requestBoardStatus();
@@ -416,6 +449,26 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   trackFlyingCard(_: number, fc: { id: number }): number { return fc.id; }
+
+  sendChat(message: string): void {
+    this.socketService.sendChatMessage(message);
+  }
+
+  private addToHistory(
+    cards: Card[],
+    playerId: string,
+    board: Board,
+    bossDisplay: string,
+    phase: string,
+  ): void {
+    if (!cards.length || !bossDisplay) return;
+    const player = board.players.find(p => p.id === playerId);
+    const playerName = playerId === this.socketService.playerId
+      ? 'Tú'
+      : (player?.name ?? '?');
+    this.historyLog.unshift({ cards, playerName, bossDisplay, phase });
+    if (this.historyLog.length > 50) this.historyLog.pop();
+  }
 
   // ─── Animación de reparto ─────────────────────────────────────────────
 

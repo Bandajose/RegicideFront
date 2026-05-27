@@ -253,6 +253,52 @@
 
   </div>
 
+  <!-- ── SIDEBAR DERECHO ── -->
+  <div class="sidebar-right">
+
+    <div class="sidebar-section-label">Historial</div>
+    <div class="history-section">
+      <div class="history-list">
+        <div class="history-entry" *ngFor="let entry of historyLog">
+          <div class="history-meta">
+            <span class="history-phase">{{ entry.phase === 'attack' ? '⚔️' : '🛡️' }}</span>
+            <strong class="history-player">{{ entry.playerName }}</strong>
+            <span class="history-vs">vs {{ entry.bossDisplay }}</span>
+          </div>
+          <div class="history-cards">
+            <span class="h-chip"
+                  *ngFor="let card of entry.cards"
+                  [class.red]="isRed(card.suit)"
+                  [class.joker]="card.suit === 'Joker'">
+              {{ card.suit === 'Joker' ? '🃏' : card.value + card.suit }}
+            </span>
+          </div>
+        </div>
+        <div class="sidebar-empty" *ngIf="historyLog.length === 0">Sin jugadas aún</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label sidebar-section-label--chat">Chat Rápido</div>
+    <div class="chat-section">
+      <div class="chat-messages">
+        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe">
+          <span class="chat-name">{{ msg.playerName }}:</span>
+          <span class="chat-text">{{ msg.message }}</span>
+        </div>
+        <div class="sidebar-empty" *ngIf="chatMessages.length === 0">Sin mensajes aún</div>
+      </div>
+      <div class="chat-buttons">
+        <button class="chat-quick-btn" (click)="sendChat('No puedo tomar el turno')">
+          🚫 No puedo tomar el turno
+        </button>
+        <button class="chat-quick-btn" (click)="sendChat('Yo tomaré el turno')">
+          ✅ Yo tomaré el turno
+        </button>
+      </div>
+    </div>
+
+  </div>
+
   <!-- Overlay de cartas volando entre zonas -->
   <div class="flying-overlay" *ngIf="flyingCards.length > 0" aria-hidden="true">
     <div class="flying-card card"

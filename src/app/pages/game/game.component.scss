@@ -7,7 +7,7 @@
   background: #0d0d0d;
   color: #fff;
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 240px 1fr 220px;
   gap: 12px;
   width: 100vw;
   height: 100vh;
@@ -771,6 +771,184 @@
   50%       { border-color: rgba(255,193,7,0.55); box-shadow: 0 0 16px rgba(255,193,7,0.12); }
 }
 
+// ─── SIDEBAR DERECHO ───────────────────────────────────────────────────────
+
+.sidebar-right {
+  background: linear-gradient(180deg, #1c1c1c 0%, #181818 100%);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  min-height: 0;
+}
+
+// ── Historial ──────────────────────────────────────────────────────────────
+
+.history-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 2px;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+}
+
+.history-entry {
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.history-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.history-phase { font-size: 11px; }
+
+.history-player {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+.history-vs {
+  font-size: 10px;
+  color: rgba(255,255,255,0.38);
+  white-space: nowrap;
+}
+
+.history-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.h-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #e0e0e0;
+
+  &.red   { color: #e74c3c; }
+  &.joker { color: #ffd54f; }
+}
+
+// ── Chat ───────────────────────────────────────────────────────────────────
+
+.sidebar-section-label--chat { margin-top: 6px; }
+
+.chat-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 6px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 2px;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+}
+
+.chat-msg {
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  border-left: 2px solid transparent;
+
+  &.me {
+    background: rgba(79,195,247,0.07);
+    border-left-color: rgba(79,195,247,0.4);
+  }
+}
+
+.chat-name {
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.chat-text { color: rgba(255,255,255,0.78); }
+
+.chat-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.chat-quick-btn {
+  width: 100%;
+  padding: 7px 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.6);
+  font-size: 10px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1.4;
+
+  &:hover {
+    background: rgba(79,195,247,0.09);
+    border-color: rgba(79,195,247,0.3);
+    color: #4fc3f7;
+  }
+}
+
+.sidebar-empty {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  font-style: italic;
+  padding: 10px 0;
+}
+
 // ─── OVERLAY ───────────────────────────────────────────────────────────────
 
 .overlay {
@@ -936,6 +1114,8 @@
     height: 100vh;
     height: 100dvh;
   }
+
+  .sidebar-right { display: none; }
 
   // ── Sidebar → barra horizontal superior ───────────────────────────────────
 
