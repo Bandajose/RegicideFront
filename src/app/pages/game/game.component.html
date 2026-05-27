@@ -227,6 +227,7 @@
                [class.joker]="card.suit === 'Joker'"
                [class.selected]="isSelected(card)"
                [class.clickable]="isMyTurn"
+               [class.inactive]="!isMyTurn"
                [class.blocked]="isMyTurn && !canAddToSelection(card)"
                [class.new-card]="newCardIndices.includes(i)"
                [style.animation-delay.s]="newCardIndices.includes(i) ? (newCardIndices.indexOf(i) * 0.15) : (i * 0.15)"

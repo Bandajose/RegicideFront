@@ -665,6 +665,14 @@
     z-index: 5;
   }
 
+  &.inactive {
+    opacity: 0.45;
+    filter: brightness(0.45) grayscale(30%);
+    animation-play-state: paused;
+    cursor: default;
+    pointer-events: none;
+  }
+
   &.blocked {
     opacity: 0.3;
     cursor: not-allowed !important;
