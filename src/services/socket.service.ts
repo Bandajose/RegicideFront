@@ -52,10 +52,11 @@ export class SocketService {
   readonly playerDisconnected$: Observable<{ playerName: string; secondsLeft: number }>;
   readonly playerReconnected$: Observable<{ playerName: string }>;
   readonly playerLeft$: Observable<{ playerName: string }>;
+  readonly chatMessage$: Observable<{ playerName: string; message: string }>;
 
   constructor() {
-    // this.socket = io('http://localhost:3000/'); --Dev
-    this.socket = io('https://two1gamebackend.onrender.com/'); //Prod
+    this.socket = io('http://localhost:3000/');
+    // this.socket = io('https://two1gamebackend.onrender.com/'); //Prod
     this.updateRooms$   = this.listen<RoomResponse>('updateRooms');
     this.lobbyUpdate$   = this.listen<LobbyUpdate>('updateLobby');
     this.boardStatus$   = this.listen<Board>('boardStatus');
@@ -65,6 +66,7 @@ export class SocketService {
     this.playerDisconnected$   = this.listen<{ playerName: string; secondsLeft: number }>('playerDisconnected');
     this.playerReconnected$    = this.listen<{ playerName: string }>('playerReconnected');
     this.playerLeft$           = this.listen<{ playerName: string }>('playerLeft');
+    this.chatMessage$          = this.listen<{ playerName: string; message: string }>('chatMessage');
 
     // Al (re)conectar: si hay sala guardada intentar reconectar
     this.socket.on('connect', () => {
@@ -172,6 +174,14 @@ export class SocketService {
     this.socket.emit('leaveGame', {
       roomName: this.currentRoom,
       playerId: this.playerId,
+    });
+  }
+
+  sendChatMessage(message: string): void {
+    this.socket.emit('chatMessage', {
+      roomName:   this.currentRoom,
+      playerName: this.playerName,
+      message,
     });
   }
 }
