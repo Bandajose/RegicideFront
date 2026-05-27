@@ -33,6 +33,8 @@ export class GameComponent implements OnInit, OnDestroy {
     playerName: string;
     bossDisplay: string;
     phase: string;
+    bossHealth: number;
+    bossDamage: number;
   }> = [];
 
   chatMessages: Array<{
@@ -55,6 +57,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private prevGraveLength = 0;
   private prevDeckLength = 0;
   private prevBossHealth = 0;
+  private prevBossDamage = 0;
   private prevBossKey = '';
   private prevBossDisplay = '';
   private flyingCardId = 0;
@@ -96,15 +99,16 @@ export class GameComponent implements OnInit, OnDestroy {
         (prevPhase === 'attack' && board.playerPhase === 'Joker');
       if (phaseJustChanged && board.table.length > this.prevTable.length && this.lastTurnId) {
         const added = board.table.slice(this.prevTable.length);
-        this.addToHistory(added, this.lastTurnId, board, `${board.currentBoss.value}${board.currentBoss.suit}`, prevPhase);
+        this.addToHistory(added, this.lastTurnId, board, `${board.currentBoss.value}${board.currentBoss.suit}`, prevPhase, board.currentBoss.health, board.currentBoss.damage);
       }
 
       // Table cards fly to graveyard
       if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
         const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
         if (bossJustDefeated) {
-          // History: golpe de gracia — usar el jefe que acaba de morir
-          this.addToHistory(this.prevTable, this.lastTurnId, board, this.prevBossDisplay, 'attack');
+          // History: golpe de gracia — las cartas del killing blow están al final del cementerio
+          const killingCards = board.grave.slice(this.prevGraveLength + this.prevTable.length);
+          this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
           // Freeze the cards so the player can see what killed the boss
           this.frozenTable = this.prevTable;
           const t = setTimeout(() => {
@@ -123,6 +127,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
       this.lastPhase = board.playerPhase;
       this.prevBossHealth = board.currentBoss.health;
+      this.prevBossDamage = board.currentBoss.damage;
       this.prevBossKey = currentBossKey;
       this.prevBossDisplay = `${board.currentBoss.value}${board.currentBoss.suit}`;
       this.prevTable = [...board.table];
@@ -460,13 +465,15 @@ export class GameComponent implements OnInit, OnDestroy {
     board: Board,
     bossDisplay: string,
     phase: string,
+    bossHealth: number,
+    bossDamage: number,
   ): void {
     if (!cards.length || !bossDisplay) return;
     const player = board.players.find(p => p.id === playerId);
     const playerName = playerId === this.socketService.playerId
       ? 'Tú'
       : (player?.name ?? '?');
-    this.historyLog.unshift({ cards, playerName, bossDisplay, phase });
+    this.historyLog.unshift({ cards, playerName, bossDisplay, phase, bossHealth, bossDamage });
     if (this.historyLog.length > 50) this.historyLog.pop();
   }
 
