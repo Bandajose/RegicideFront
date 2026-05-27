@@ -197,6 +197,13 @@
       </div>
     </div>
 
+    <!-- Contador de selección: espacio fijo, nunca desplaza la mesa -->
+    <div class="hand-info-row">
+      <span class="hand-info" [style.visibility]="selectedCards.length > 0 ? 'visible' : 'hidden'">
+        {{ selectedCards.length }} carta{{ selectedCards.length !== 1 ? 's' : '' }} seleccionada{{ selectedCards.length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+
     <!-- 4) Mano + botones de acción -->
     <div class="hand-container">
       <button class="btn btn-defend"
@@ -206,9 +213,6 @@
       </button>
 
       <div class="hand-area">
-        <div class="hand-info" *ngIf="selectedCards.length > 0">
-          {{ selectedCards.length }} carta{{ selectedCards.length !== 1 ? 's' : '' }} seleccionada{{ selectedCards.length !== 1 ? 's' : '' }}
-        </div>
         <div class="hand-cards">
           <div class="card hand-card"
                *ngFor="let card of hand; let i = index"
