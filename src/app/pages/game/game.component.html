@@ -208,7 +208,7 @@
         <button class="btn-pass"
                 *ngIf="isMyTurn && board.playerPhase === 'attack'"
                 (click)="passAttack()">
-          ⏭ Pasar turno
+          ⏭ {{ board.currentBoss.damage === 0 ? 'Pasar turno' : 'Pasar a Modo defensa' }}
         </button>
       </div>
 
