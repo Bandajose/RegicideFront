@@ -324,6 +324,10 @@
   &.boss-attack .boss-card {
     animation: bossAttack 0.65s ease-in-out !important;
   }
+
+  &.boss-hit .boss-card {
+    animation: boss-hit-shake 0.55s ease-out forwards !important;
+  }
 }
 
 .boss-badge {
@@ -671,6 +675,7 @@
   &.new-card {
     animation: card-deal 0.45s ease-out forwards !important;
   }
+
 }
 
 // Reverso de carta (pila mazo/cementerio)
@@ -711,6 +716,44 @@
   25%  { opacity: 1; }
   78%  { transform: translateY(8px) scale(1.04) rotate(1deg); }
   100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes fly-to-target {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+  20%  { opacity: 1; }
+  80%  { opacity: 0.7; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.22) rotate(14deg); opacity: 0; }
+}
+
+@keyframes boss-hit-shake {
+  0%   { transform: translateX(0) scale(1); filter: brightness(1); }
+  12%  { transform: translateX(-10px) scale(0.95); filter: brightness(2.2) saturate(3) hue-rotate(-15deg); }
+  28%  { transform: translateX(9px) scale(1.05); filter: brightness(1.6); }
+  44%  { transform: translateX(-6px) scale(0.98); }
+  60%  { transform: translateX(5px); }
+  76%  { transform: translateX(-3px); }
+  100% { transform: translateX(0) scale(1); filter: brightness(1); }
+}
+
+// ─── FLYING CARDS OVERLAY ──────────────────────────────────────────────────
+
+.flying-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+  overflow: hidden;
+}
+
+.flying-card {
+  position: absolute !important;
+  width: 56px !important;
+  height: 80px !important;
+  animation: fly-to-target 0.46s cubic-bezier(0.4, 0, 0.8, 1) forwards !important;
+  font-size: 11px;
+
+  .corner { font-size: 8px !important; }
+  .suit-center { font-size: 22px !important; }
 }
 
 @keyframes pulse-dot {

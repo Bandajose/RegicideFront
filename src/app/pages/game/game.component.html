@@ -125,7 +125,7 @@
     <div class="center-zone">
 
       <!-- Cementerio -->
-      <div class="pile-zone">
+      <div class="pile-zone" #gravePileEl>
         <div class="pile-label">Cementerio</div>
         <div class="pile-stack" *ngIf="board.grave.length > 0; else emptyPile">
           <div class="card card-back grave-back p-back"></div>
@@ -137,7 +137,7 @@
       </div>
 
       <!-- Jefe -->
-      <div class="boss-zone" [class.boss-attack]="bossAttacking">
+      <div class="boss-zone" [class.boss-attack]="bossAttacking" [class.boss-hit]="bossHit">
         <span class="boss-badge">
           {{ board.currentBoss.value === 'K' ? '👑 REY' : board.currentBoss.value === 'Q' ? '👸 REINA' : '⚔️ JOTA' }}
         </span>
@@ -167,7 +167,7 @@
       </div>
 
       <!-- Mazo -->
-      <div class="pile-zone">
+      <div class="pile-zone" #deckPileEl>
         <div class="pile-label">Mazo</div>
         <div class="pile-stack" *ngIf="board.deck.length > 0; else emptyDeck">
           <div class="card card-back p-back"></div>
@@ -182,7 +182,7 @@
 
     <!-- 3) Cartas jugadas (mesa) -->
     <div class="table-zone">
-      <div class="table-panel" [class.has-cards]="board.table.length > 0">
+      <div class="table-panel" #tablePanelEl [class.has-cards]="board.table.length > 0">
         <span class="zone-label">
           Mesa · {{ board.table.length }} carta{{ board.table.length !== 1 ? 's' : '' }}
         </span>
@@ -251,6 +251,27 @@
     </div>
 
   </div>
+
+  <!-- Overlay de cartas volando entre zonas -->
+  <div class="flying-overlay" *ngIf="flyingCards.length > 0" aria-hidden="true">
+    <div class="flying-card card"
+         *ngFor="let fc of flyingCards; trackBy: trackFlyingCard"
+         [class.card-back]="!fc.card"
+         [class.red]="fc.card && isRed(fc.card.suit)"
+         [class.joker]="fc.card && fc.card.suit === 'Joker'"
+         [style.left.px]="fc.x"
+         [style.top.px]="fc.y"
+         [style.--dx]="fc.dx"
+         [style.--dy]="fc.dy"
+         [style.animation-delay.ms]="fc.delay">
+      <ng-container *ngIf="fc.card">
+        <span class="corner tl">{{ fc.card.value }}<br>{{ fc.card.suit }}</span>
+        <span class="suit-center">{{ fc.card.suit }}</span>
+        <span class="corner br">{{ fc.card.value }}<br>{{ fc.card.suit }}</span>
+      </ng-container>
+    </div>
+  </div>
+
 </div>
 
 <ng-template #loadingTpl>

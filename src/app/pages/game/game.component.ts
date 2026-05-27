@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
@@ -13,10 +13,19 @@ import { Card } from '../../Data/Card';
   styleUrl: './game.component.scss'
 })
 export class GameComponent implements OnInit, OnDestroy {
+  @ViewChild('gravePileEl') gravePileEl?: ElementRef<HTMLElement>;
+  @ViewChild('deckPileEl')  deckPileEl?: ElementRef<HTMLElement>;
+  @ViewChild('tablePanelEl') tablePanelEl?: ElementRef<HTMLElement>;
+
   board: Board | null = null;
   hand: Card[] = [];
   selectedCards: Card[] = [];
   bossAttacking = false;
+  bossHit = false;
+  flyingCards: Array<{
+    id: number; card?: Card;
+    x: number; y: number; dx: string; dy: string; delay: number;
+  }> = [];
   disconnectedPlayer: string | null = null;
   disconnectCountdown = 0;
   playerLeftName: string | null = null;
@@ -28,9 +37,17 @@ export class GameComponent implements OnInit, OnDestroy {
   private lastTurnId = '';
   private playerDataReceived = false;
   private prevHand: Card[] = [];
+  private prevTable: Card[] = [];
+  private prevGraveLength = 0;
+  private prevDeckLength = 0;
+  private prevBossHealth = 0;
+  private prevBossKey = '';
+  private flyingCardId = 0;
+  private flyingCleanupTimeouts: ReturnType<typeof setTimeout>[] = [];
   private disconnectInterval: ReturnType<typeof setInterval> | null = null;
   private toastTimeout: ReturnType<typeof setTimeout> | null = null;
   private dealClearTimeout: ReturnType<typeof setTimeout> | null = null;
+  private bossHitTimeout: ReturnType<typeof setTimeout> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -47,11 +64,31 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
       const prevPhase = this.lastPhase;
+      const currentBossKey = `${board.currentBoss.value}_${board.currentBoss.suit}`;
 
-      if (prevPhase === 'defend' && board.playerPhase === 'attack') {
+      // Boss lunges when it attacks (attack → defend transition)
+      if (prevPhase === 'attack' && board.playerPhase === 'defend') {
         this.triggerBossAttack();
       }
+      // Boss shakes when hit (same boss, health dropped)
+      if (this.prevBossKey === currentBossKey && this.prevBossHealth > 0 && board.currentBoss.health < this.prevBossHealth) {
+        this.triggerBossHit();
+      }
+      // Table cards fly to graveyard
+      if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
+        this.triggerTableDiscard(this.prevTable);
+      }
+      // Graveyard reshuffles into deck
+      if (this.prevGraveLength > 0 && board.grave.length === 0 && board.deck.length > this.prevDeckLength) {
+        this.triggerGraveToDeck();
+      }
+
       this.lastPhase = board.playerPhase;
+      this.prevBossHealth = board.currentBoss.health;
+      this.prevBossKey = currentBossKey;
+      this.prevTable = [...board.table];
+      this.prevGraveLength = board.grave.length;
+      this.prevDeckLength = board.deck.length;
 
       const newTurnId = board.playerTurn;
       const isJokerPhase = board.playerPhase === 'Joker';
@@ -101,6 +138,8 @@ export class GameComponent implements OnInit, OnDestroy {
     this.clearDisconnectState();
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
     if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
+    if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
+    this.flyingCleanupTimeouts.forEach(t => clearTimeout(t));
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -292,6 +331,79 @@ export class GameComponent implements OnInit, OnDestroy {
       this.socketService.playTurn('attack', []);
     }
   }
+
+  // ─── Animaciones de tablero ───────────────────────────────────────────
+
+  private triggerBossHit(): void {
+    if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
+    this.bossHit = false;
+    setTimeout(() => { this.bossHit = true; }, 0);
+    this.bossHitTimeout = setTimeout(() => {
+      this.bossHit = false;
+      this.bossHitTimeout = null;
+    }, 600);
+  }
+
+  private triggerTableDiscard(cards: Card[]): void {
+    const tableEl = this.tablePanelEl?.nativeElement;
+    const graveEl = this.gravePileEl?.nativeElement;
+    if (!tableEl || !graveEl) return;
+
+    const tr = tableEl.getBoundingClientRect();
+    const gr = graveEl.getBoundingClientRect();
+    const sx = tr.left + tr.width / 2;
+    const sy = tr.top + tr.height / 2;
+    const dx = (gr.left + gr.width / 2 - sx) + 'px';
+    const dy = (gr.top + gr.height / 2 - sy) + 'px';
+
+    const batch = cards.map((card, i) => ({
+      id: ++this.flyingCardId,
+      card,
+      x: sx - 28 + (Math.random() - 0.5) * 28,
+      y: sy - 40 + (Math.random() - 0.5) * 18,
+      dx, dy,
+      delay: i * 75,
+    }));
+    this.flyingCards = [...this.flyingCards, ...batch];
+
+    const ids = new Set(batch.map(c => c.id));
+    const t = setTimeout(() => {
+      this.flyingCards = this.flyingCards.filter(c => !ids.has(c.id));
+    }, (cards.length - 1) * 75 + 520);
+    this.flyingCleanupTimeouts.push(t);
+  }
+
+  private triggerGraveToDeck(): void {
+    const graveEl = this.gravePileEl?.nativeElement;
+    const deckEl  = this.deckPileEl?.nativeElement;
+    if (!graveEl || !deckEl) return;
+
+    const gr = graveEl.getBoundingClientRect();
+    const dr = deckEl.getBoundingClientRect();
+    const sx = gr.left + gr.width / 2;
+    const sy = gr.top + gr.height / 2;
+    const dx = (dr.left + dr.width / 2 - sx) + 'px';
+    const dy = (dr.top + dr.height / 2 - sy) + 'px';
+
+    const count = Math.min(this.prevGraveLength, 8);
+    const batch = Array.from({ length: count }, (_, i) => ({
+      id: ++this.flyingCardId,
+      card: undefined as Card | undefined,
+      x: sx - 28 + (Math.random() - 0.5) * 22,
+      y: sy - 40 + (Math.random() - 0.5) * 16,
+      dx, dy,
+      delay: i * 65,
+    }));
+    this.flyingCards = [...this.flyingCards, ...batch];
+
+    const ids = new Set(batch.map(c => c.id));
+    const t = setTimeout(() => {
+      this.flyingCards = this.flyingCards.filter(c => !ids.has(c.id));
+    }, (count - 1) * 65 + 520);
+    this.flyingCleanupTimeouts.push(t);
+  }
+
+  trackFlyingCard(_: number, fc: { id: number }): number { return fc.id; }
 
   // ─── Animación de reparto ─────────────────────────────────────────────
 
