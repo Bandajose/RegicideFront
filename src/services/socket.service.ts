@@ -156,11 +156,9 @@ export class SocketService {
   }
 
   claimJokerTurn(): void {
-    this.socket.emit('playTurn', {
+    this.socket.emit('claimJokerTurn', {
       roomName: this.currentRoom,
       playerId: this.playerId,
-      action: 'Joker',
-      cards: [],
     });
   }
 }

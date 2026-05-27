@@ -72,7 +72,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get canClaimJokerTurn(): boolean {
-    return this.board?.playerPhase === 'Joker' && !this.isMyTurn;
+    return this.board?.playerPhase === 'Joker' && this.hand.length > 0;
   }
 
   get deckStack(): number[] {
@@ -100,7 +100,7 @@ export class GameComponent implements OnInit, OnDestroy {
   // ─── Acciones del jugador ─────────────────────────────────────────────
 
   toggleCard(card: Card): void {
-    if (!this.isMyTurn) return;
+    if (!this.isMyTurn || this.board?.playerPhase === 'Joker') return;
     const idx = this.selectedCards.findIndex(c => c.value === card.value && c.suit === card.suit);
     if (idx >= 0) {
       this.selectedCards.splice(idx, 1);
@@ -174,7 +174,6 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   claimJokerTurn(): void {
-    if (!this.canClaimJokerTurn) return;
     this.socketService.claimJokerTurn();
   }
 

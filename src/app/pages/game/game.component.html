@@ -59,16 +59,15 @@
          [class.my-turn]="isMyTurn && board.playerPhase !== 'Joker'"
          [class.joker-phase]="board.playerPhase === 'Joker'">
 
-      <!-- Fase Joker: yo lo jugué -->
-      <ng-container *ngIf="board.playerPhase === 'Joker' && isMyTurn">
+      <!-- Fase Joker -->
+      <ng-container *ngIf="board.playerPhase === 'Joker'">
         <span class="turn-icon">🃏</span>
-        <span class="turn-text">Joker jugado — otro jugador puede tomar el turno</span>
-      </ng-container>
-
-      <!-- Fase Joker: otro jugador puede reclamar -->
-      <ng-container *ngIf="board.playerPhase === 'Joker' && !isMyTurn">
-        <span class="turn-icon">🃏</span>
-        <span class="turn-text">¡<strong>Joker activo</strong>! Puedes tomar el turno</span>
+        <ng-container *ngIf="hand.length > 0">
+          <span class="turn-text">¡<strong>Joker activo</strong>! Puedes tomar el turno</span>
+        </ng-container>
+        <ng-container *ngIf="hand.length === 0">
+          <span class="turn-text">¡<strong>Joker activo</strong>! Otro jugador tomará el turno</span>
+        </ng-container>
       </ng-container>
 
       <!-- Turno normal -->
@@ -89,7 +88,7 @@
       </ng-container>
     </div>
 
-    <!-- Botón de reclamar turno (Joker activo, no es mi turno) -->
+    <!-- Botón de reclamar turno (Joker activo, tiene cartas) -->
     <div class="joker-claim-zone" *ngIf="canClaimJokerTurn">
       <button class="btn-claim-joker" (click)="claimJokerTurn()">
         🃏 Tomar turno
