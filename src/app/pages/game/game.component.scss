@@ -166,6 +166,7 @@
   box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.05);
   overflow: hidden;
+  position: relative;
 }
 
 // ─── TURN BANNER ───────────────────────────────────────────────────────────
@@ -832,4 +833,40 @@
     font-size: 40px;
     animation: float 2s ease-in-out infinite;
   }
+}
+
+// ─── TOAST DE TURNO ────────────────────────────────────────────────────────
+
+.turn-toast {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: #fff;
+  border: 1px solid rgba(105,240,174,0.35);
+  border-radius: 18px;
+  padding: 16px 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 150;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 36px rgba(46,125,50,0.28);
+  animation: toast-pop 2.6s ease-out forwards;
+
+  strong { font-weight: 700; color: #69f0ae; }
+}
+
+.toast-icon { font-size: 22px; }
+
+@keyframes toast-pop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.75); }
+  12%  { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  72%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
 }

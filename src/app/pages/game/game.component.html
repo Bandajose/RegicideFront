@@ -74,6 +74,12 @@
   <!-- ── MAIN AREA ── -->
   <div class="main-area">
 
+    <!-- ── TOAST DE TURNO ── -->
+    <div class="turn-toast" *ngIf="showTurnToast">
+      <span class="toast-icon">⚔️</span>
+      <span>¡Tu turno, <strong>{{ playerName }}</strong>!</span>
+    </div>
+
     <!-- 1) Banner de turno -->
     <div class="turn-banner"
          [class.my-turn]="isMyTurn && board.playerPhase !== 'Joker'"

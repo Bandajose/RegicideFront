@@ -21,9 +21,13 @@ export class GameComponent implements OnInit, OnDestroy {
   disconnectCountdown = 0;
   playerLeftName: string | null = null;
 
+  showTurnToast = false;
+
   private lastPhase = '';
+  private lastTurnId = '';
   private playerDataReceived = false;
   private disconnectInterval: ReturnType<typeof setInterval> | null = null;
+  private toastTimeout: ReturnType<typeof setTimeout> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -39,10 +43,23 @@ export class GameComponent implements OnInit, OnDestroy {
     });
 
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
-      if (this.lastPhase === 'defend' && board.playerPhase === 'attack') {
+      const prevPhase = this.lastPhase;
+
+      if (prevPhase === 'defend' && board.playerPhase === 'attack') {
         this.triggerBossAttack();
       }
       this.lastPhase = board.playerPhase;
+
+      const newTurnId = board.playerTurn;
+      const isJokerPhase = board.playerPhase === 'Joker';
+      const jokerJustResolved = prevPhase === 'Joker' && !isJokerPhase;
+      const turnChangedToMe = newTurnId === this.socketService.playerId && newTurnId !== this.lastTurnId;
+
+      if (!isJokerPhase && newTurnId === this.socketService.playerId && (turnChangedToMe || jokerJustResolved)) {
+        this.triggerTurnToast();
+      }
+      this.lastTurnId = newTurnId;
+
       this.board = board;
       this.checkAutoActions();
     });
@@ -72,6 +89,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearDisconnectState();
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -96,10 +114,24 @@ export class GameComponent implements OnInit, OnDestroy {
     this.disconnectCountdown = 0;
   }
 
+  private triggerTurnToast(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    this.showTurnToast = false;
+    setTimeout(() => { this.showTurnToast = true; }, 0);
+    this.toastTimeout = setTimeout(() => {
+      this.showTurnToast = false;
+      this.toastTimeout = null;
+    }, 2600);
+  }
+
   // ─── Getters de conveniencia ───────────────────────────────────────────
 
   get playerId(): string {
     return this.socketService.playerId;
+  }
+
+  get playerName(): string {
+    return this.socketService.playerName;
   }
 
   get roomName(): string {
