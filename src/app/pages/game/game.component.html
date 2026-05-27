@@ -182,13 +182,14 @@
 
     <!-- 3) Cartas jugadas (mesa) -->
     <div class="table-zone">
-      <div class="table-panel" #tablePanelEl [class.has-cards]="board.table.length > 0">
+      <div class="table-panel" #tablePanelEl
+           [class.has-cards]="board.table.length > 0 || frozenTable.length > 0">
         <span class="zone-label">
-          Mesa · {{ board.table.length }} carta{{ board.table.length !== 1 ? 's' : '' }}
+          Mesa · {{ (board.table.length > 0 ? board.table : frozenTable).length }} carta{{ (board.table.length > 0 ? board.table : frozenTable).length !== 1 ? 's' : '' }}
         </span>
-        <div class="table-cards" *ngIf="board.table.length > 0">
+        <div class="table-cards" *ngIf="board.table.length > 0 || frozenTable.length > 0">
           <div class="card table-card"
-               *ngFor="let card of board.table; let i = index"
+               *ngFor="let card of (board.table.length > 0 ? board.table : frozenTable); let i = index"
                [class.red]="isRed(card.suit)"
                [class.joker]="card.suit === 'Joker'"
                [style.animation-delay.s]="i * 0.2">
@@ -197,7 +198,7 @@
             <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
           </div>
         </div>
-        <div class="table-empty" *ngIf="board.table.length === 0">
+        <div class="table-empty" *ngIf="board.table.length === 0 && frozenTable.length === 0">
           Sin cartas jugadas
         </div>
       </div>

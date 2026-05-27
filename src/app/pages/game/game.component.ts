@@ -26,6 +26,7 @@ export class GameComponent implements OnInit, OnDestroy {
     id: number; card?: Card;
     x: number; y: number; dx: string; dy: string; delay: number;
   }> = [];
+  frozenTable: Card[] = [];
   disconnectedPlayer: string | null = null;
   disconnectCountdown = 0;
   playerLeftName: string | null = null;
@@ -76,7 +77,18 @@ export class GameComponent implements OnInit, OnDestroy {
       }
       // Table cards fly to graveyard
       if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
-        this.triggerTableDiscard(this.prevTable);
+        const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
+        if (bossJustDefeated) {
+          // Freeze the cards on screen so the player can see what killed the boss
+          this.frozenTable = this.prevTable;
+          const t = setTimeout(() => {
+            this.triggerTableDiscard(this.frozenTable);
+            this.frozenTable = [];
+          }, 1500);
+          this.flyingCleanupTimeouts.push(t);
+        } else {
+          this.triggerTableDiscard(this.prevTable);
+        }
       }
       // Graveyard reshuffles into deck
       if (this.prevGraveLength > 0 && board.grave.length === 0 && board.deck.length > this.prevDeckLength) {
