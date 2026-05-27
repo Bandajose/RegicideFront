@@ -1011,6 +1011,7 @@
     width: 100%;
     gap: 4px;
     overflow-x: auto;
+    padding-top: 22px;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
   }
@@ -1030,8 +1031,8 @@
   }
 
   .hand-card {
-    width: 71px;
-    height: 103px;
+    width: 62px;
+    height: 90px;
     flex-shrink: 0;
 
     .suit-center { font-size: 22px; }
