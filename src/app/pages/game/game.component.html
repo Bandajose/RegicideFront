@@ -227,7 +227,8 @@
                [class.selected]="isSelected(card)"
                [class.clickable]="isMyTurn"
                [class.blocked]="isMyTurn && !canAddToSelection(card)"
-               [style.animation-delay.s]="i * 0.15"
+               [class.new-card]="newCardIndices.includes(i)"
+               [style.animation-delay.s]="newCardIndices.includes(i) ? (newCardIndices.indexOf(i) * 0.15) : (i * 0.15)"
                (click)="toggleCard(card)">
             <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
             <span class="suit-center">{{ card.suit }}</span>

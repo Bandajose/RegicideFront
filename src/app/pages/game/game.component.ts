@@ -20,14 +20,17 @@ export class GameComponent implements OnInit, OnDestroy {
   disconnectedPlayer: string | null = null;
   disconnectCountdown = 0;
   playerLeftName: string | null = null;
+  newCardIndices: number[] = [];
 
   showTurnToast = false;
 
   private lastPhase = '';
   private lastTurnId = '';
   private playerDataReceived = false;
+  private prevHand: Card[] = [];
   private disconnectInterval: ReturnType<typeof setInterval> | null = null;
   private toastTimeout: ReturnType<typeof setTimeout> | null = null;
+  private dealClearTimeout: ReturnType<typeof setTimeout> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -66,7 +69,14 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.socketService.playerData$.pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.playerDataReceived = true;
+      const prevKeys = new Set(this.prevHand.map(c => `${c.value}_${c.suit}`));
+      const newIndices: number[] = [];
+      data.hand.forEach((card, i) => {
+        if (!prevKeys.has(`${card.value}_${card.suit}`)) newIndices.push(i);
+      });
+      this.prevHand = [...data.hand];
       this.hand = data.hand;
+      if (newIndices.length > 0) this.triggerCardDeal(newIndices);
       this.checkAutoActions();
     });
 
@@ -90,6 +100,7 @@ export class GameComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearDisconnectState();
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -280,6 +291,18 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.board.playerPhase === 'attack' && this.playerDataReceived && this.hand.length === 0) {
       this.socketService.playTurn('attack', []);
     }
+  }
+
+  // ─── Animación de reparto ─────────────────────────────────────────────
+
+  private triggerCardDeal(indices: number[]): void {
+    if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
+    this.newCardIndices = indices;
+    const totalMs = (indices.length - 1) * 150 + 450 + 300;
+    this.dealClearTimeout = setTimeout(() => {
+      this.newCardIndices = [];
+      this.dealClearTimeout = null;
+    }, totalMs);
   }
 
   // ─── Animación del jefe ───────────────────────────────────────────────

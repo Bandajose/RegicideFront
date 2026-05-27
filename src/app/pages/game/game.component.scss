@@ -667,6 +667,10 @@
     animation-play-state: paused;
     filter: grayscale(40%);
   }
+
+  &.new-card {
+    animation: card-deal 0.45s ease-out forwards !important;
+  }
 }
 
 // Reverso de carta (pila mazo/cementerio)
@@ -700,6 +704,13 @@
   25%  { transform: translateY(-36px) scale(1.12); }
   60%  { transform: translateY(8px) scale(0.97); }
   100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes card-deal {
+  0%   { transform: translateY(-200px) scale(0.35) rotate(-10deg); opacity: 0; }
+  25%  { opacity: 1; }
+  78%  { transform: translateY(8px) scale(1.04) rotate(1deg); }
+  100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
 }
 
 @keyframes pulse-dot {
