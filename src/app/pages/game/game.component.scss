@@ -82,7 +82,13 @@
   &:hover { transform: translateY(-1px); }
 }
 
-.player-avatar { font-size: 18px; }
+.player-color-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
 
 .player-info {
   display: flex;
@@ -832,30 +838,31 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   flex-wrap: wrap;
+  border-left: 3px solid #fff;
+  padding-left: 6px;
 }
 
-.history-phase { font-size: 11px; }
+.history-phase { font-size: 13px; }
 
 .history-player {
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70px;
+  max-width: 72px;
 }
 
 .history-vs {
-  font-size: 10px;
+  font-size: 14px;
   color: rgba(255,255,255,0.38);
   white-space: nowrap;
 }
 
 .history-boss-stats {
-  font-size: 9px;
+  font-size: 12px;
   color: rgba(255,255,255,0.45);
   white-space: nowrap;
   margin-left: auto;
@@ -865,20 +872,71 @@
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
+  padding-left: 9px;
 }
 
 .h-chip {
   display: inline-flex;
   align-items: center;
-  padding: 1px 5px;
+  padding: 2px 6px;
   background: rgba(255,255,255,0.08);
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: #e0e0e0;
 
   &.red   { color: #e74c3c; }
   &.joker { color: #ffd54f; }
+}
+
+.history-boss-defeat {
+  background: rgba(255, 213, 79, 0.1);
+  border: 1px solid rgba(255, 213, 79, 0.35);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd54f;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+// ── Anuncio de jefe derrotado ──────────────────────────────────────────────
+
+.boss-announcement {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(255, 213, 79, 0.5);
+  border-radius: 16px;
+  padding: 20px 32px;
+  text-align: center;
+  z-index: 400;
+  pointer-events: none;
+  animation: boss-ann-pop 0.35s ease-out forwards;
+  box-shadow: 0 0 40px rgba(255, 213, 79, 0.15);
+}
+
+.boss-ann-defeated {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd54f;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.boss-ann-next {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+
+  strong { color: #fff; }
+}
+
+@keyframes boss-ann-pop {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.88); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 // ── Chat ───────────────────────────────────────────────────────────────────

@@ -35,7 +35,11 @@ export class GameComponent implements OnInit, OnDestroy {
     phase: string;
     bossHealth: number;
     bossDamage: number;
+    playerColor: string;
+    isDefeatedBoss?: boolean;
   }> = [];
+
+  bossAnnouncement: { defeated: string; next: string } | null = null;
 
   chatMessages: Array<{
     playerName: string;
@@ -56,6 +60,8 @@ export class GameComponent implements OnInit, OnDestroy {
   private prevTable: Card[] = [];
   private prevGraveLength = 0;
   private prevDeckLength = 0;
+  private readonly COLOR_PALETTE = ['#4fc3f7', '#81c784', '#ffb74d', '#f06292', '#ce93d8', '#4db6ac'];
+  private playerColorMap = new Map<string, string>();
   private prevBossHealth = 0;
   private prevBossDamage = 0;
   private prevBossKey = '';
@@ -66,6 +72,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private toastTimeout: ReturnType<typeof setTimeout> | null = null;
   private dealClearTimeout: ReturnType<typeof setTimeout> | null = null;
   private bossHitTimeout: ReturnType<typeof setTimeout> | null = null;
+  private bossAnnouncementTimeout: ReturnType<typeof setTimeout> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -83,6 +90,13 @@ export class GameComponent implements OnInit, OnDestroy {
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
       const prevPhase = this.lastPhase;
       const currentBossKey = `${board.currentBoss.value}_${board.currentBoss.suit}`;
+
+      // Asignar color por jugador la primera vez que se ve
+      board.players.forEach((p, i) => {
+        if (!this.playerColorMap.has(p.id)) {
+          this.playerColorMap.set(p.id, this.COLOR_PALETTE[i % this.COLOR_PALETTE.length]);
+        }
+      });
 
       // Boss lunges when it attacks (attack → defend transition)
       if (prevPhase === 'attack' && board.playerPhase === 'defend') {
@@ -109,6 +123,9 @@ export class GameComponent implements OnInit, OnDestroy {
           // History: golpe de gracia — las cartas del killing blow están al final del cementerio
           const killingCards = board.grave.slice(this.prevGraveLength + this.prevTable.length);
           this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
+          this.addBossDefeatedEntry(this.prevBossDisplay);
+          const nextBoss = board.endGame ? '¡Victoria!' : `${board.currentBoss.value}${board.currentBoss.suit}`;
+          this.triggerBossAnnouncement(this.prevBossDisplay, nextBoss);
           // Freeze the cards so the player can see what killed the boss
           this.frozenTable = this.prevTable;
           const t = setTimeout(() => {
@@ -189,6 +206,7 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
     if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
     if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
+    if (this.bossAnnouncementTimeout) clearTimeout(this.bossAnnouncementTimeout);
     this.flyingCleanupTimeouts.forEach(t => clearTimeout(t));
     this.destroy$.next();
     this.destroy$.complete();
@@ -222,6 +240,37 @@ export class GameComponent implements OnInit, OnDestroy {
       this.showTurnToast = false;
       this.toastTimeout = null;
     }, 2600);
+  }
+
+  // ─── Color por jugador ────────────────────────────────────────────────
+
+  playerColorOf(playerId: string): string {
+    return this.playerColorMap.get(playerId) ?? '#ffffff';
+  }
+
+  // ─── Anuncio de jefe derrotado ────────────────────────────────────────
+
+  private triggerBossAnnouncement(defeated: string, next: string): void {
+    if (this.bossAnnouncementTimeout) clearTimeout(this.bossAnnouncementTimeout);
+    this.bossAnnouncement = { defeated, next };
+    this.bossAnnouncementTimeout = setTimeout(() => {
+      this.bossAnnouncement = null;
+      this.bossAnnouncementTimeout = null;
+    }, 3500);
+  }
+
+  private addBossDefeatedEntry(defeatedBoss: string): void {
+    this.historyLog.unshift({
+      cards: [{ value: '★', suit: defeatedBoss }] as any,
+      playerName: '',
+      bossDisplay: defeatedBoss,
+      phase: 'defeat',
+      bossHealth: 0,
+      bossDamage: 0,
+      playerColor: '#ffd54f',
+      isDefeatedBoss: true,
+    });
+    if (this.historyLog.length > 50) this.historyLog.pop();
   }
 
   // ─── Getters de conveniencia ───────────────────────────────────────────
@@ -493,7 +542,8 @@ export class GameComponent implements OnInit, OnDestroy {
     const playerName = playerId === this.socketService.playerId
       ? 'Tú'
       : (player?.name ?? '?');
-    this.historyLog.unshift({ cards, playerName, bossDisplay, phase, bossHealth, bossDamage });
+    const playerColor = this.playerColorOf(playerId);
+    this.historyLog.unshift({ cards, playerName, bossDisplay, phase, bossHealth, bossDamage, playerColor });
     if (this.historyLog.length > 50) this.historyLog.pop();
   }
 
