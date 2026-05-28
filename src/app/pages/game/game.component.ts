@@ -116,30 +116,23 @@ export class GameComponent implements OnInit, OnDestroy {
         this.addToHistory(added, this.lastTurnId, board, `${board.currentBoss.value}${board.currentBoss.suit}`, prevPhase, board.currentBoss.health, board.currentBoss.damage);
       }
 
-      // Table cards fly to graveyard
-      if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
-        const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
-        if (bossJustDefeated) {
-          // History: golpe de gracia — cuando el daño es excesivo, el boss va al cementerio
-          // antes que las cartas de la mesa, hay que saltar esa carta extra.
-          const newGraveCards = board.grave.slice(this.prevGraveLength);
-          const bossCardInGrave = newGraveCards.length > 0 && ['J', 'Q', 'K'].includes(newGraveCards[0].value);
-          const killingCards = board.grave.slice(this.prevGraveLength + (bossCardInGrave ? 1 : 0) + this.prevTable.length);
-          this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
-          this.addBossDefeatedEntry(this.prevBossDisplay);
-          if (!board.endGame) {
-            this.triggerBossAnnouncement(this.prevBossDisplay, `${board.currentBoss.value}${board.currentBoss.suit}`);
-          }
-          // Freeze the cards so the player can see what killed the boss
-          this.frozenTable = this.prevTable;
-          const t = setTimeout(() => {
-            this.triggerTableDiscard(this.frozenTable);
-            this.frozenTable = [];
-          }, 1500);
-          this.flyingCleanupTimeouts.push(t);
-        } else {
-          this.triggerTableDiscard(this.prevTable);
+      // Boss derrotado: detectar por cambio de boss key (no requiere prevTable > 0)
+      const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
+      if (bossJustDefeated && board.table.length === 0) {
+        const newGraveCards = board.grave.slice(this.prevGraveLength);
+        const bossCardInGrave = newGraveCards.length > 0 && ['J', 'Q', 'K'].includes(newGraveCards[0].value);
+        const killingCards = board.grave.slice(this.prevGraveLength + (bossCardInGrave ? 1 : 0) + this.prevTable.length);
+        this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
+        this.addBossDefeatedEntry(this.prevBossDisplay);
+        if (!board.endGame) {
+          this.triggerBossAnnouncement(this.prevBossDisplay, `${board.currentBoss.value}${board.currentBoss.suit}`);
         }
+        this.frozenTable = this.prevTable;
+        const t = setTimeout(() => {
+          this.triggerTableDiscard(this.frozenTable);
+          this.frozenTable = [];
+        }, 1500);
+        this.flyingCleanupTimeouts.push(t);
       }
       // Graveyard reshuffles into deck
       if (this.prevGraveLength > 0 && board.grave.length === 0 && board.deck.length > this.prevDeckLength) {
