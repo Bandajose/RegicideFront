@@ -120,8 +120,11 @@ export class GameComponent implements OnInit, OnDestroy {
       if (this.prevTable.length > 0 && board.table.length === 0 && board.grave.length > this.prevGraveLength) {
         const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
         if (bossJustDefeated) {
-          // History: golpe de gracia — las cartas del killing blow están al final del cementerio
-          const killingCards = board.grave.slice(this.prevGraveLength + this.prevTable.length);
+          // History: golpe de gracia — cuando el daño es excesivo, el boss va al cementerio
+          // antes que las cartas de la mesa, hay que saltar esa carta extra.
+          const newGraveCards = board.grave.slice(this.prevGraveLength);
+          const bossCardInGrave = newGraveCards.length > 0 && ['J', 'Q', 'K'].includes(newGraveCards[0].value);
+          const killingCards = board.grave.slice(this.prevGraveLength + (bossCardInGrave ? 1 : 0) + this.prevTable.length);
           this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
           this.addBossDefeatedEntry(this.prevBossDisplay);
           if (!board.endGame) {
