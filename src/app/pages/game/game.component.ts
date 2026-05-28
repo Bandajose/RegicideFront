@@ -124,8 +124,9 @@ export class GameComponent implements OnInit, OnDestroy {
           const killingCards = board.grave.slice(this.prevGraveLength + this.prevTable.length);
           this.addToHistory(killingCards, this.lastTurnId, board, this.prevBossDisplay, 'attack', 0, this.prevBossDamage);
           this.addBossDefeatedEntry(this.prevBossDisplay);
-          const nextBoss = board.endGame ? '¡Victoria!' : `${board.currentBoss.value}${board.currentBoss.suit}`;
-          this.triggerBossAnnouncement(this.prevBossDisplay, nextBoss);
+          if (!board.endGame) {
+            this.triggerBossAnnouncement(this.prevBossDisplay, `${board.currentBoss.value}${board.currentBoss.suit}`);
+          }
           // Freeze the cards so the player can see what killed the boss
           this.frozenTable = this.prevTable;
           const t = setTimeout(() => {
@@ -140,6 +141,14 @@ export class GameComponent implements OnInit, OnDestroy {
       // Graveyard reshuffles into deck
       if (this.prevGraveLength > 0 && board.grave.length === 0 && board.deck.length > this.prevDeckLength) {
         this.triggerGraveToDeck();
+      }
+
+      if (board.endGame && this.bossAnnouncement) {
+        this.bossAnnouncement = null;
+        if (this.bossAnnouncementTimeout) {
+          clearTimeout(this.bossAnnouncementTimeout);
+          this.bossAnnouncementTimeout = null;
+        }
       }
 
       this.lastPhase = board.playerPhase;
