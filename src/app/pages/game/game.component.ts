@@ -374,6 +374,9 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private cardPoints(value: string): number {
     if (value === 'A') return 1;
+    if (value === 'J') return 10;
+    if (value === 'Q') return 15;
+    if (value === 'K') return 20;
     return parseInt(value, 10) || 0;
   }
 
