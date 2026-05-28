@@ -246,6 +246,26 @@ export class GameComponent implements OnInit, OnDestroy {
     return this.board?.playerPhase === 'Joker' && this.hand.length > 0;
   }
 
+  get canDefend(): boolean {
+    if (!this.isMyTurn || !this.board || this.board.playerPhase !== 'defend') return false;
+
+    const bossDamage = this.board.currentBoss.damage;
+    if (bossDamage === 0) return true;
+    if (!this.selectedCards.length) return false;
+
+    // Joker en selección cancela todo el daño
+    if (this.selectedCards.some(c => c.suit === 'Joker')) return true;
+
+    const selectedSum = this.selectedCards.reduce((acc, c) => acc + this.cardPoints(c.value), 0);
+    if (selectedSum >= bossDamage) return true;
+
+    // Si con toda la mano no se puede cubrir, permitir defensa parcial (pierde vida)
+    const handCanCover = this.hand.some(c => c.suit === 'Joker') ||
+      this.hand.reduce((acc, c) => acc + this.cardPoints(c.value), 0) >= bossDamage;
+
+    return !handCanCover;
+  }
+
   get deckStack(): number[] {
     return Array(Math.min(this.board?.deck.length ?? 0, 3)).fill(0);
   }

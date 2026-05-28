@@ -214,7 +214,7 @@
     <!-- 4) Mano + botones de acción -->
     <div class="hand-container">
       <button class="btn btn-defend"
-              [disabled]="!isMyTurn || board.playerPhase !== 'defend' || !selectedCards.length"
+              [disabled]="!canDefend"
               (click)="playTurn()">
         🛡️ Defender
       </button>
