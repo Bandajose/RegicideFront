@@ -9,11 +9,13 @@
   display: grid;
   grid-template-columns: 240px 1fr 220px;
   gap: 12px;
-  width: 100vw;
-  height: 100vh;
+  width: calc(100vw / 1.1);
+  height: calc(100vh / 1.1);
   padding: 12px;
   overflow: hidden;
   position: relative;
+  transform: scale(1.1);
+  transform-origin: top left;
 }
 
 // ─── SIDEBAR ───────────────────────────────────────────────────────────────
