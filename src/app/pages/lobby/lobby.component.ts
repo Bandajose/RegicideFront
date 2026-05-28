@@ -17,6 +17,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   players: LobbyPlayer[] = [];
   config: RoomConfig = { ...DEFAULT_CONFIG };
   private destroy$ = new Subject<void>();
+  private gameStarting = false;
 
   constructor(private socketService: SocketService, private router: Router) {}
 
@@ -45,12 +46,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
     this.socketService.boardStatus$.pipe(takeUntil(this.destroy$)).subscribe(board => {
       if (board?.playerTurn) {
+        this.gameStarting = true;
         this.router.navigate(['/game']);
       }
     });
   }
 
   ngOnDestroy() {
+    if (!this.gameStarting && this.socketService.currentRoom) {
+      this.socketService.leaveRoom();
+      this.socketService.currentRoom = '';
+      this.socketService.playerId = '';
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -102,6 +109,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   leaveRoom() {
+    this.socketService.leaveRoom();
     this.socketService.currentRoom = '';
     this.socketService.playerId = '';
     this.router.navigate(['/']);

@@ -55,8 +55,8 @@ export class SocketService {
   readonly chatMessage$: Observable<{ playerName: string; message: string }>;
 
   constructor() {
-    this.socket = io('http://localhost:3000/');
-    // this.socket = io('https://two1gamebackend.onrender.com/'); //Prod
+    // this.socket = io('http://localhost:3000/'); //dev
+    this.socket = io('https://two1gamebackend.onrender.com/'); //Prod
     this.updateRooms$   = this.listen<RoomResponse>('updateRooms');
     this.lobbyUpdate$   = this.listen<LobbyUpdate>('updateLobby');
     this.boardStatus$   = this.listen<Board>('boardStatus');
@@ -145,6 +145,10 @@ export class SocketService {
   }
 
   // ─── Partida ────────────────────────────────────────────────────────────
+
+  leaveRoom(): void {
+    this.socket.emit('leaveRoom', this.currentRoom);
+  }
 
   startGame(): void {
     this.socket.emit('startGame', this.currentRoom);
