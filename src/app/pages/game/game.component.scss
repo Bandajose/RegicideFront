@@ -160,6 +160,32 @@
   &:hover:not(:disabled) { background: rgba(255,77,77,0.18); }
 }
 
+.sidebar-bottom-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+
+  .btn-leave { flex: 1; }
+}
+
+.btn-mute {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.12); }
+}
+
 // ─── MAIN AREA ─────────────────────────────────────────────────────────────
 
 .main-area {
@@ -1416,9 +1442,10 @@
   }
 
   // Ocultar sidebars; mostrar nav y panel
-  .sidebar-right { display: none; }
-  .mobile-nav    { display: flex; }
-  .mobile-panel  { display: flex; }
+  .sidebar-right       { display: none; }
+  .sidebar-bottom-actions { display: none; }
+  .mobile-nav          { display: flex; }
+  .mobile-panel        { display: flex; }
 
   // ── Sidebar → barra horizontal superior ───────────────────────────────────
 
@@ -1702,10 +1729,13 @@
     margin-bottom: 12px;
   }
 
-  .mpanel-leave {
-    width: 100%;
-    display: block;
+  .mpanel-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
     flex-shrink: 0;
+
+    .mpanel-leave { flex: 1; display: block; }
   }
 
   // History tab

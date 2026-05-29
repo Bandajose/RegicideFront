@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from '../../../services/socket.service';
+import { SoundService } from '../../../services/sound.service';
 import { Board } from '../../Data/Board';
 import { Card } from '../../Data/Card';
 
@@ -140,7 +141,11 @@ export class GameComponent implements OnInit, OnDestroy {
   private turnTimerInterval: ReturnType<typeof setInterval> | null = null;
   private destroy$ = new Subject<void>();
 
-  constructor(private socketService: SocketService, private router: Router) {}
+  constructor(
+    private socketService: SocketService,
+    private router: Router,
+    public soundService: SoundService,
+  ) {}
 
   ngOnInit(): void {
     if (!this.socketService.currentRoom) {
@@ -170,6 +175,7 @@ export class GameComponent implements OnInit, OnDestroy {
       // Boss shakes when hit (same boss, health dropped)
       if (this.prevBossKey === currentBossKey && this.prevBossHealth > 0 && board.currentBoss.health < this.prevBossHealth) {
         this.triggerBossHit();
+        this.soundService.bossHit();
       }
       // History: only log when a meaningful phase transition completes
       const phaseJustChanged =
@@ -184,6 +190,7 @@ export class GameComponent implements OnInit, OnDestroy {
       // Boss derrotado: detectar por cambio de boss key (no requiere prevTable > 0)
       const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
       if (bossJustDefeated && board.table.length === 0) {
+        this.soundService.bossDefeated();
         const newGraveCards = board.grave.slice(this.prevGraveLength);
         const bossCardInGrave = newGraveCards.length > 0 && ['J', 'Q', 'K'].includes(newGraveCards[0].value);
         const killingCards = board.grave.slice(this.prevGraveLength + (bossCardInGrave ? 1 : 0) + this.prevTable.length);
@@ -339,6 +346,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private triggerTurnToast(): void {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
     this.showTurnToast = false;
+    this.soundService.yourTurn();
     setTimeout(() => { this.showTurnToast = true; }, 0);
     this.toastTimeout = setTimeout(() => {
       this.showTurnToast = false;
@@ -543,6 +551,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   playTurn(): void {
     if (!this.isMyTurn || !this.selectedCards.length || !this.board) return;
+    if (this.board.playerPhase === 'attack') this.soundService.attack();
     this.socketService.playTurn(this.board.playerPhase, this.selectedCards);
     this.selectedCards = [];
   }

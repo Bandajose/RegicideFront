@@ -68,7 +68,12 @@
       </div>
     </div>
 
-    <button class="btn btn-leave" (click)="leaveGame()">🚪 Salir</button>
+    <div class="sidebar-bottom-actions">
+      <button class="btn-mute" (click)="soundService.toggleMute()" [title]="soundService.muted ? 'Activar sonido' : 'Silenciar'">
+        {{ soundService.muted ? '🔇' : '🔊' }}
+      </button>
+      <button class="btn btn-leave" (click)="leaveGame()">🚪 Salir</button>
+    </div>
   </div>
 
   <!-- ── MAIN AREA ── -->
@@ -397,7 +402,12 @@
           <strong>{{ board.bosses.length }}</strong>
         </div>
       </div>
-      <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir de la partida</button>
+      <div class="mpanel-actions">
+        <button class="btn-mute" (click)="soundService.toggleMute()" [title]="soundService.muted ? 'Activar sonido' : 'Silenciar'">
+          {{ soundService.muted ? '🔇' : '🔊' }}
+        </button>
+        <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir de la partida</button>
+      </div>
     </div>
 
     <!-- Historial tab -->
