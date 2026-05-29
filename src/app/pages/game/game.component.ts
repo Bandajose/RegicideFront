@@ -65,6 +65,22 @@ export class GameComponent implements OnInit, OnDestroy {
   // Boss effect tooltip
   showEffectTooltip = false;
 
+  // Mobile tab notifications
+  chatUnread = false;
+  turnUnread = false;
+
+  // Card zoom
+  zoomedCard: Card | null = null;
+
+  // Rules overlay
+  showRules = false;
+
+  // End-game stats
+  statsCardsPlayed = 0;
+  statsBossesDefeated = 0;
+  statsDamageDealt = 0;
+  statsTurnsPlayed = 0;
+
   readonly bossEffectDetails: Record<string, string> = {
     '♥': 'Tu ataque ♥ revive cartas del cementerio al mazo. Este jefe bloquea esa habilidad.',
     '♦': 'Tu ataque ♦ reparte cartas a todos los jugadores. Este jefe bloquea esa habilidad.',
@@ -191,6 +207,7 @@ export class GameComponent implements OnInit, OnDestroy {
       const bossJustDefeated = this.prevBossKey !== '' && this.prevBossKey !== currentBossKey;
       if (bossJustDefeated && board.table.length === 0) {
         this.soundService.bossDefeated();
+        this.statsBossesDefeated++;
         const newGraveCards = board.grave.slice(this.prevGraveLength);
         const bossCardInGrave = newGraveCards.length > 0 && ['J', 'Q', 'K'].includes(newGraveCards[0].value);
         const killingCards = board.grave.slice(this.prevGraveLength + (bossCardInGrave ? 1 : 0) + this.prevTable.length);
@@ -287,6 +304,7 @@ export class GameComponent implements OnInit, OnDestroy {
       }
       this.chatMessages.push({ playerName: isMe ? 'Tú' : playerName, message, isMe, color });
       if (this.chatMessages.length > 60) this.chatMessages.shift();
+      if (this.mobileTab !== 'chat') this.chatUnread = true;
       this.scrollChatToBottom();
     });
 
@@ -347,6 +365,8 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
     this.showTurnToast = false;
     this.soundService.yourTurn();
+    this.statsTurnsPlayed++;
+    if (this.mobileTab !== 'game') this.turnUnread = true;
     setTimeout(() => { this.showTurnToast = true; }, 0);
     this.toastTimeout = setTimeout(() => {
       this.showTurnToast = false;
@@ -557,6 +577,10 @@ export class GameComponent implements OnInit, OnDestroy {
   playTurn(): void {
     if (!this.isMyTurn || !this.selectedCards.length || !this.board) return;
     if (this.board.playerPhase === 'attack') this.soundService.attack();
+    this.statsCardsPlayed += this.selectedCards.length;
+    if (this.board.playerPhase === 'attack' && this.turnPreview) {
+      this.statsDamageDealt += this.turnPreview.damage;
+    }
     this.socketService.playTurn(this.board.playerPhase, this.selectedCards);
     this.selectedCards = [];
   }
@@ -739,5 +763,24 @@ export class GameComponent implements OnInit, OnDestroy {
   private triggerBossAttack(): void {
     this.bossAttacking = true;
     setTimeout(() => (this.bossAttacking = false), 650);
+  }
+
+  // ─── Tab móvil ────────────────────────────────────────────────────────
+
+  switchTab(tab: 'game' | 'players' | 'history' | 'chat'): void {
+    this.mobileTab = tab;
+    if (tab === 'chat') this.chatUnread = false;
+    if (tab === 'game') this.turnUnread = false;
+  }
+
+  // ─── Zoom de carta ────────────────────────────────────────────────────
+
+  openZoom(card: Card, event: Event): void {
+    event.stopPropagation();
+    this.zoomedCard = card;
+  }
+
+  closeZoom(): void {
+    this.zoomedCard = null;
   }
 }

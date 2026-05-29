@@ -26,6 +26,24 @@
         <h1>{{ board.winGame ? '¡Ganaron!' : 'Han perdido' }}</h1>
         <p>{{ board.winGame ? 'Derrotaron a todos los jefes.' : 'El jefe hizo demasiado daño.' }}</p>
       </ng-template>
+      <div class="endgame-stats" *ngIf="statsTurnsPlayed > 0 || statsCardsPlayed > 0">
+        <div class="endgame-stat">
+          <span class="es-val">{{ statsTurnsPlayed }}</span>
+          <span class="es-label">Turnos</span>
+        </div>
+        <div class="endgame-stat">
+          <span class="es-val">{{ statsCardsPlayed }}</span>
+          <span class="es-label">Cartas jugadas</span>
+        </div>
+        <div class="endgame-stat">
+          <span class="es-val">{{ statsBossesDefeated }}</span>
+          <span class="es-label">Jefes derrotados</span>
+        </div>
+        <div class="endgame-stat">
+          <span class="es-val">{{ statsDamageDealt }}</span>
+          <span class="es-label">Daño total</span>
+        </div>
+      </div>
       <button (click)="leaveGame()">Volver al Inicio</button>
     </div>
   </div>
@@ -72,6 +90,7 @@
       <button class="btn-mute" (click)="soundService.toggleMute()" [title]="soundService.muted ? 'Activar sonido' : 'Silenciar'">
         {{ soundService.muted ? '🔇' : '🔊' }}
       </button>
+      <button class="btn-mute" (click)="showRules = true" title="Reglas del juego">❓</button>
       <button class="btn btn-leave" (click)="leaveGame()">🚪 Salir</button>
     </div>
   </div>
@@ -259,6 +278,7 @@
             <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
             <span class="suit-center">{{ card.suit }}</span>
             <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            <button class="card-zoom-btn" (click)="openZoom(card, $event)" title="Ver carta">🔍</button>
             <div class="effect-blocked-badge" *ngIf="isEffectBlocked(card)">
               <span class="blocked-icon">🚫</span>
               <span class="blocked-label">Sin efecto</span>
@@ -355,20 +375,26 @@
 
   <!-- ── MOBILE NAV ── -->
   <div class="mobile-nav">
-    <button class="mobile-nav-btn" [class.active]="mobileTab === 'game'" (click)="mobileTab = 'game'">
-      <span class="mnav-icon">⚔️</span>
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'game'" (click)="switchTab('game')">
+      <span class="mnav-icon-wrap">
+        <span class="mnav-icon">⚔️</span>
+        <span class="mnav-badge" *ngIf="turnUnread && mobileTab !== 'game'"></span>
+      </span>
       <span class="mnav-label">Juego</span>
     </button>
-    <button class="mobile-nav-btn" [class.active]="mobileTab === 'players'" (click)="mobileTab = 'players'">
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'players'" (click)="switchTab('players')">
       <span class="mnav-icon">👥</span>
       <span class="mnav-label">Jugadores</span>
     </button>
-    <button class="mobile-nav-btn" [class.active]="mobileTab === 'history'" (click)="mobileTab = 'history'">
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'history'" (click)="switchTab('history')">
       <span class="mnav-icon">📜</span>
       <span class="mnav-label">Historial</span>
     </button>
-    <button class="mobile-nav-btn" [class.active]="mobileTab === 'chat'" (click)="mobileTab = 'chat'">
-      <span class="mnav-icon">💬</span>
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'chat'" (click)="switchTab('chat')">
+      <span class="mnav-icon-wrap">
+        <span class="mnav-icon">💬</span>
+        <span class="mnav-badge" *ngIf="chatUnread && mobileTab !== 'chat'"></span>
+      </span>
       <span class="mnav-label">Chat</span>
     </button>
   </div>
@@ -410,6 +436,7 @@
         <button class="btn-mute" (click)="soundService.toggleMute()" [title]="soundService.muted ? 'Activar sonido' : 'Silenciar'">
           {{ soundService.muted ? '🔇' : '🔊' }}
         </button>
+        <button class="btn-mute" (click)="showRules = true" title="Reglas del juego">❓</button>
         <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir de la partida</button>
       </div>
     </div>
@@ -485,6 +512,74 @@
     </div>
     <div class="boss-ann-next" *ngIf="bossAnnouncement.next === '¡Victoria!'">
       🏆 ¡Todos los jefes derrotados!
+    </div>
+  </div>
+
+  <!-- ── OVERLAY REGLAS ── -->
+  <div class="overlay rules-overlay" *ngIf="showRules" (click)="showRules = false">
+    <div class="rules-box" (click)="$event.stopPropagation()">
+      <button class="rules-close" (click)="showRules = false">✕</button>
+      <h2 class="rules-title">📖 Reglas de Regicide</h2>
+      <div class="rules-body">
+        <div class="rules-section">
+          <h3>🎯 Objetivo</h3>
+          <p>Derroten en equipo a los 12 jefes (J, Q, K de los 4 palos) antes de quedarse sin cartas o recibir daño mortal.</p>
+        </div>
+        <div class="rules-section">
+          <h3>🔄 Turno</h3>
+          <p>El jugador activo primero <strong>ataca</strong> y luego <strong>defiende</strong> si el jefe hace daño.</p>
+          <ul>
+            <li>Puedes jugar <strong>1 carta sola</strong>.</li>
+            <li>Puedes jugar <strong>un As + cualquier otra carta</strong> (máx. 2).</li>
+            <li>Puedes jugar <strong>varias cartas del mismo valor</strong> si su suma ≤ 10.</li>
+          </ul>
+        </div>
+        <div class="rules-section">
+          <h3>♣ ♠ ♥ ♦ Efectos de palo</h3>
+          <ul>
+            <li><strong>♣ Tréboles</strong> — Duplica el daño al jefe.</li>
+            <li><strong>♠ Picas</strong> — Reduce el ataque del jefe esa cantidad.</li>
+            <li><strong>♥ Corazones</strong> — Mueve cartas del cementerio al mazo.</li>
+            <li><strong>♦ Diamantes</strong> — Reparte cartas a todos los jugadores.</li>
+          </ul>
+          <p class="rules-note">El jefe bloquea el efecto de su propio palo.</p>
+        </div>
+        <div class="rules-section">
+          <h3>👑 Jefes</h3>
+          <ul>
+            <li><strong>Jota (J)</strong> — 20 ❤️ · 10 ⚔️</li>
+            <li><strong>Reina (Q)</strong> — 30 ❤️ · 15 ⚔️</li>
+            <li><strong>Rey (K)</strong> — 40 ❤️ · 20 ⚔️</li>
+          </ul>
+        </div>
+        <div class="rules-section">
+          <h3>🃏 Joker</h3>
+          <p>En defensa cancela <strong>todo el daño</strong>. También activa la fase Joker: cualquier jugador con cartas puede tomar el turno.</p>
+        </div>
+        <div class="rules-section">
+          <h3>💀 Derrota</h3>
+          <p>Si no pueden cubrir el daño del jefe con las cartas en mano, pierden.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── OVERLAY ZOOM DE CARTA ── -->
+  <div class="overlay card-zoom-overlay" *ngIf="zoomedCard" (click)="closeZoom()">
+    <div class="card-zoom-modal" (click)="$event.stopPropagation()">
+      <div class="card zoomed-card"
+           [class.red]="isRed(zoomedCard.suit)"
+           [class.joker]="zoomedCard.suit === 'Joker'">
+        <span class="corner tl">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
+        <span class="suit-center">{{ zoomedCard.suit }}</span>
+        <span class="zoomed-main-value">{{ zoomedCard.value }}</span>
+        <span class="corner br">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
+        <div class="effect-blocked-badge" *ngIf="isEffectBlocked(zoomedCard)">
+          <span class="blocked-icon">🚫</span>
+          <span class="blocked-label">Sin efecto</span>
+        </div>
+      </div>
+      <p class="zoom-hint">Toca fuera para cerrar</p>
     </div>
   </div>
 
