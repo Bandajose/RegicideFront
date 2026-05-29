@@ -4,7 +4,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #121212, #1e1e1e);
+  background: var(--bg-lobby, linear-gradient(135deg, #121212, #1e1e1e));
+  background-size: cover;
+  background-position: center;
   color: #fff;
   padding: 24px 0;
 }
