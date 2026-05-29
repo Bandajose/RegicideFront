@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from '../../../services/socket.service';
 import { SoundService } from '../../../services/sound.service';
+import { GameHistoryService } from '../../../services/game-history.service';
 import { Board } from '../../Data/Board';
 import { Card } from '../../Data/Card';
 
@@ -75,11 +76,23 @@ export class GameComponent implements OnInit, OnDestroy {
   // Rules overlay
   showRules = false;
 
+  // Leave confirm
+  showLeaveConfirm = false;
+
+  // Share link toast
+  showCopiedToast = false;
+
+  // Confetti particles
+  confettiParticles: Array<{ x: number; color: string; delay: number; duration: number; size: number; drift: number }> = [];
+  private endGameTriggered = false;
+
   // End-game stats
   statsCardsPlayed = 0;
   statsBossesDefeated = 0;
   statsDamageDealt = 0;
   statsTurnsPlayed = 0;
+
+  readonly quickEmojis = ['👍', '😮', '🔥', '😱', '👎', '🤝'];
 
   readonly bossEffectDetails: Record<string, string> = {
     '♥': 'Tu ataque ♥ revive cartas del cementerio al mazo. Este jefe bloquea esa habilidad.',
@@ -161,6 +174,7 @@ export class GameComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private router: Router,
     public soundService: SoundService,
+    private historyService: GameHistoryService,
   ) {}
 
   ngOnInit(): void {
@@ -263,6 +277,18 @@ export class GameComponent implements OnInit, OnDestroy {
       this.lastTurnId = newTurnId;
 
       this.board = board;
+      if (board.endGame && !this.endGameTriggered) {
+        this.endGameTriggered = true;
+        if (board.winGame) this.triggerConfetti();
+        this.historyService.save({
+          result: board.winGame ? 'win' : 'loss',
+          roomName: this.socketService.currentRoom,
+          turns: this.statsTurnsPlayed,
+          cards: this.statsCardsPlayed,
+          bosses: this.statsBossesDefeated,
+          damage: this.statsDamageDealt,
+        });
+      }
       this.checkAutoActions();
     });
 
@@ -602,12 +628,37 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   leaveGame(): void {
+    if (this.board?.endGame) {
+      this.doLeave();
+    } else {
+      this.showLeaveConfirm = true;
+    }
+  }
+
+  doLeave(): void {
+    this.showLeaveConfirm = false;
     if (this.board && !this.board.endGame) {
+      this.historyService.save({
+        result: 'left',
+        roomName: this.socketService.currentRoom,
+        turns: this.statsTurnsPlayed,
+        cards: this.statsCardsPlayed,
+        bosses: this.statsBossesDefeated,
+        damage: this.statsDamageDealt,
+      });
       this.socketService.leaveGame();
     }
     this.socketService.currentRoom = '';
     this.socketService.playerId = '';
     this.router.navigate(['/']);
+  }
+
+  copyRoomLink(): void {
+    const url = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(this.roomName)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.showCopiedToast = true;
+      setTimeout(() => { this.showCopiedToast = false; }, 2200);
+    }).catch(() => {});
   }
 
   // ─── Auto-acciones ────────────────────────────────────────────────────
@@ -756,6 +807,19 @@ export class GameComponent implements OnInit, OnDestroy {
       this.newCardIndices = [];
       this.dealClearTimeout = null;
     }, totalMs);
+  }
+
+  private triggerConfetti(): void {
+    const colors = ['#ffd54f', '#4fc3f7', '#81c784', '#f06292', '#ce93d8', '#ff8a65', '#a5d6a7'];
+    this.confettiParticles = Array.from({ length: 55 }, () => ({
+      x:        Math.random() * 100,
+      color:    colors[Math.floor(Math.random() * colors.length)],
+      delay:    Math.floor(Math.random() * 2500),
+      duration: 2200 + Math.floor(Math.random() * 1800),
+      size:     7 + Math.floor(Math.random() * 8),
+      drift:    Math.floor((Math.random() - 0.5) * 100),
+    }));
+    setTimeout(() => { this.confettiParticles = []; }, 5500);
   }
 
   // ─── Animación del jefe ───────────────────────────────────────────────

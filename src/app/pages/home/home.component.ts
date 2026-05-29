@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { SocketService } from '../../../services/socket.service';
+import { GameHistoryService, GameRecord } from '../../../services/game-history.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CreateRoomRequest } from '../../Data/CreateRoomRequest';
@@ -21,16 +22,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   roomName = '';
   searchQuery = '';
   tempName = '';
+  gameHistory: GameRecord[] = [];
 
   private currentPage = '1';
   private pageSize = '5';
   private destroy$ = new Subject<void>();
 
-  constructor(private socketService: SocketService, private router: Router) {}
+  constructor(
+    private socketService: SocketService,
+    private router: Router,
+    private historyService: GameHistoryService,
+  ) {}
 
   ngOnInit() {
+    this.gameHistory = this.historyService.getAll();
+    const room = new URLSearchParams(window.location.search).get('room');
+    if (room) this.roomName = room;
     if (this.hasName) {
       this.loadRooms();
+      if (room) this.joinRoom();
     }
   }
 
@@ -57,6 +67,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!trimmed) return;
     this.playerName = trimmed;
     this.loadRooms();
+    if (this.roomName.trim()) this.joinRoom();
   }
 
   changeName() {
@@ -141,6 +152,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.errorMessage = response.message || 'Error al crear la sala.';
       }
     });
+  }
+
+  clearHistory(): void {
+    this.historyService.clear();
+    this.gameHistory = [];
   }
 
   prevPage() {

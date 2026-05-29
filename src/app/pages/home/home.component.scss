@@ -495,6 +495,82 @@ $muted:     rgba(255,255,255,0.4);
   text-align: center;
 }
 
+// ─── HISTORIAL ────────────────────────────────────────────────────────────────
+
+.history-section {
+  padding: 0 32px 32px;
+  animation: fadeUp 0.4s ease;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.history-clear-btn {
+  font-size: 11px;
+  font-family: 'Poppins', sans-serif;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid rgba(255,77,77,0.3);
+  border-radius: 20px;
+  color: rgba(255,77,77,0.65);
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover { background: rgba(255,77,77,0.1); color: #ff6b6b; border-color: rgba(255,77,77,0.55); }
+}
+
+.history-records {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-record {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 10px 14px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
+}
+
+.hr-icon { font-size: 22px; flex-shrink: 0; }
+
+.hr-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hr-room {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hr-stats {
+  font-size: 11px;
+  color: $muted;
+}
+
+.hr-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 // ─── ANIMACIONES ──────────────────────────────────────────────────────────────
 
 @keyframes fadeUp {
@@ -566,4 +642,7 @@ $muted:     rgba(255,255,255,0.4);
 
   .pg-btn  { width: 36px; height: 36px; }
   .pg-info { font-size: 12px; }
+
+  .history-section { padding: 0 14px 20px; }
+  .history-record  { max-width: 100%; }
 }

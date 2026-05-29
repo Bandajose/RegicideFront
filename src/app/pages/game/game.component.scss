@@ -2053,4 +2053,203 @@
     overflow-y: auto;
     align-content: flex-start;
   }
+
+  .mpanel-emoji-reactions {
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+}
+
+// ─── Compatible card highlight ──────────────────────────────────────────────
+
+.hand-card.compatible {
+  box-shadow: 0 0 0 2px rgba(105, 240, 174, 0.65), 0 4px 14px rgba(0,0,0,0.4) !important;
+}
+
+// ─── Thinking dots ──────────────────────────────────────────────────────────
+
+.thinking-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 4px;
+
+  span {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ffc107;
+    animation: thinking-bounce 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes thinking-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30%            { transform: translateY(-4px); opacity: 1; }
+}
+
+// ─── Emoji reactions ────────────────────────────────────────────────────────
+
+.emoji-reactions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.emoji-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 16px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover {
+    background: rgba(255,255,255,0.12);
+    transform: scale(1.18);
+  }
+
+  &:active { transform: scale(0.92); }
+}
+
+// ─── Share button in room panel ─────────────────────────────────────────────
+
+.btn-share-small {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  margin-left: auto;
+  flex-shrink: 0;
+
+  &:hover { background: rgba(255,255,255,0.1); }
+}
+
+// ─── Copied toast ───────────────────────────────────────────────────────────
+
+.copied-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.94);
+  border: 1px solid rgba(105,240,174,0.4);
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #69f0ae;
+  z-index: 900;
+  pointer-events: none;
+  animation: toast-pop 2.2s ease-out forwards;
+  white-space: nowrap;
+}
+
+// ─── Leave confirm dialog ───────────────────────────────────────────────────
+
+.confirm-overlay {
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(4px);
+  z-index: 760;
+}
+
+.confirm-box {
+  background: linear-gradient(160deg, #1e1e1e, #161616);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 36px 44px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: card-zoom-in 0.2s ease-out forwards;
+
+  .confirm-icon { font-size: 40px; margin-bottom: 4px; }
+
+  h3 { font-size: 18px; font-weight: 700; }
+
+  p { font-size: 13px; color: rgba(255,255,255,0.45); }
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-confirm-cancel {
+  padding: 10px 24px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background: rgba(255,255,255,0.12); color: #fff; }
+}
+
+.btn-confirm-leave {
+  padding: 10px 24px;
+  background: rgba(231,76,60,0.14);
+  border: 1px solid rgba(231,76,60,0.35);
+  border-radius: 10px;
+  color: #ff6b6b;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background: rgba(231,76,60,0.28); }
+}
+
+// ─── End-game loss flash ────────────────────────────────────────────────────
+
+.overlay.endgame-loss {
+  animation: loss-flash 0.55s ease-out forwards;
+}
+
+@keyframes loss-flash {
+  0%   { background: rgba(180, 0, 0, 0.72); }
+  100% { background: rgba(0, 0, 0, 0.92); }
+}
+
+// ─── Confetti ───────────────────────────────────────────────────────────────
+
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 800;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -16px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateY(105vh) translateX(var(--drift, 0px)) rotate(540deg); opacity: 0; }
 }

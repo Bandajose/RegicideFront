@@ -16,6 +16,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   roomName = '';
   players: LobbyPlayer[] = [];
   config: RoomConfig = { ...DEFAULT_CONFIG };
+  showCopiedToast = false;
   private destroy$ = new Subject<void>();
   private gameStarting = false;
 
@@ -119,6 +120,14 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   startGame() {
     this.socketService.startGame();
+  }
+
+  copyRoomLink(): void {
+    const url = `${window.location.origin}/?room=${encodeURIComponent(this.roomName)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.showCopiedToast = true;
+      setTimeout(() => { this.showCopiedToast = false; }, 2200);
+    }).catch(() => {});
   }
 
   leaveRoom() {

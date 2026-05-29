@@ -99,4 +99,25 @@
     </section>
 
   </main>
+
+  <!-- ── HISTORIAL DE PARTIDAS ── -->
+  <section class="history-section" *ngIf="gameHistory.length > 0">
+    <div class="history-header">
+      <h2 class="panel-title">Mis últimas partidas</h2>
+      <button class="history-clear-btn" (click)="clearHistory()">Limpiar</button>
+    </div>
+    <div class="history-records">
+      <div class="history-record" *ngFor="let r of gameHistory">
+        <span class="hr-icon">
+          {{ r.result === 'win' ? '🏆' : r.result === 'loss' ? '💀' : '🚪' }}
+        </span>
+        <div class="hr-info">
+          <span class="hr-room">{{ r.roomName }}</span>
+          <span class="hr-stats">{{ r.turns }} turnos · {{ r.bosses }} 👑 · {{ r.damage }} ⚔️</span>
+        </div>
+        <span class="hr-date">{{ r.date | date:'d/M HH:mm' }}</span>
+      </div>
+    </div>
+  </section>
+
 </div>

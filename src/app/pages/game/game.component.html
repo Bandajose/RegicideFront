@@ -14,7 +14,7 @@
   </div>
 
   <!-- ── OVERLAY FIN DE PARTIDA ── -->
-  <div class="overlay" *ngIf="board.endGame">
+  <div class="overlay" *ngIf="board.endGame" [class.endgame-loss]="!board.winGame && !playerLeftName">
     <div class="overlay-box">
       <ng-container *ngIf="playerLeftName; else normalEnd">
         <div class="overlay-icon">🚪</div>
@@ -60,7 +60,12 @@
       <div class="player" *ngFor="let p of board.players" [class.active-turn]="p.id === board.playerTurn">
         <div class="player-color-dot" [style.background]="playerColorOf(p.id)"></div>
         <div class="player-info">
-          <span class="player-name">{{ p.id === playerId ? 'Tú' : p.name }}</span>
+          <span class="player-name">
+            {{ p.id === playerId ? 'Tú' : p.name }}
+            <span class="thinking-dots" *ngIf="p.id === board.playerTurn && !board.endGame">
+              <span></span><span></span><span></span>
+            </span>
+          </span>
           <span class="player-cards">🃏 {{ p.cardCount }} cartas</span>
         </div>
         <span class="turn-indicator" *ngIf="p.id === board.playerTurn"></span>
@@ -272,6 +277,7 @@
                [class.clickable]="isMyTurn"
                [class.inactive]="!isMyTurn"
                [class.blocked]="isMyTurn && !canAddToSelection(card)"
+               [class.compatible]="isMyTurn && selectedCards.length > 0 && !isSelected(card) && canAddToSelection(card)"
                [class.new-card]="newCardIndices.includes(i)"
                [style.animation-delay.s]="newCardIndices.includes(i) ? (newCardIndices.indexOf(i) * 0.15) : (i * 0.15)"
                (click)="toggleCard(card)">
@@ -341,6 +347,9 @@
     </div>
 
     <div class="sidebar-section-label sidebar-section-label--chat">Chat Rápido</div>
+    <div class="emoji-reactions">
+      <button class="emoji-btn" *ngFor="let e of quickEmojis" (click)="sendChat(e)">{{ e }}</button>
+    </div>
     <div class="chat-section">
       <div class="chat-messages" #chatMsgsDesktop>
         <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe"
@@ -437,7 +446,7 @@
           {{ soundService.muted ? '🔇' : '🔊' }}
         </button>
         <button class="btn-mute" (click)="showRules = true" title="Reglas del juego">❓</button>
-        <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir de la partida</button>
+        <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir</button>
       </div>
     </div>
 
@@ -481,6 +490,9 @@
         </div>
         <div class="sidebar-empty" *ngIf="chatMessages.length === 0">Sin mensajes aún</div>
       </div>
+      <div class="emoji-reactions mpanel-emoji-reactions">
+        <button class="emoji-btn" *ngFor="let e of quickEmojis" (click)="sendChat(e)">{{ e }}</button>
+      </div>
       <div class="chat-quick-panel mpanel-quick-panel">
         <div class="chat-quick-label">💬 Respuesta rápida</div>
         <div class="chat-categories mpanel-chat-categories">
@@ -512,6 +524,35 @@
     </div>
     <div class="boss-ann-next" *ngIf="bossAnnouncement.next === '¡Victoria!'">
       🏆 ¡Todos los jefes derrotados!
+    </div>
+  </div>
+
+  <!-- ── OVERLAY CONFIRMAR SALIDA ── -->
+  <div class="overlay confirm-overlay" *ngIf="showLeaveConfirm" (click)="showLeaveConfirm = false">
+    <div class="confirm-box" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">🚪</div>
+      <h3>¿Salir de la partida?</h3>
+      <p>Los demás jugadores perderán si te vas.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-cancel" (click)="showLeaveConfirm = false">Cancelar</button>
+        <button class="btn-confirm-leave" (click)="doLeave()">Sí, salir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFETTI VICTORIA ── -->
+  <div class="confetti-container" *ngIf="confettiParticles.length" aria-hidden="true">
+    <div class="confetti-piece"
+         *ngFor="let p of confettiParticles"
+         [ngStyle]="{
+           left: p.x + '%',
+           width: p.size + 'px',
+           height: p.size + 'px',
+           background: p.color,
+           'animation-delay': p.delay + 'ms',
+           'animation-duration': p.duration + 'ms',
+           '--drift': p.drift + 'px'
+         }">
     </div>
   </div>
 
