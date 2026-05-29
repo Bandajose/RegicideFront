@@ -13,9 +13,11 @@ import { Card } from '../../Data/Card';
   styleUrl: './game.component.scss'
 })
 export class GameComponent implements OnInit, OnDestroy {
-  @ViewChild('gravePileEl') gravePileEl?: ElementRef<HTMLElement>;
-  @ViewChild('deckPileEl')  deckPileEl?: ElementRef<HTMLElement>;
-  @ViewChild('tablePanelEl') tablePanelEl?: ElementRef<HTMLElement>;
+  @ViewChild('gravePileEl')       gravePileEl?: ElementRef<HTMLElement>;
+  @ViewChild('deckPileEl')        deckPileEl?: ElementRef<HTMLElement>;
+  @ViewChild('tablePanelEl')      tablePanelEl?: ElementRef<HTMLElement>;
+  @ViewChild('chatMsgsDesktop')   chatMsgsDesktop?: ElementRef<HTMLElement>;
+  @ViewChild('chatMsgsMobile')    chatMsgsMobile?: ElementRef<HTMLElement>;
 
   board: Board | null = null;
   hand: Card[] = [];
@@ -45,6 +47,7 @@ export class GameComponent implements OnInit, OnDestroy {
     playerName: string;
     message: string;
     isMe: boolean;
+    color: string;
   }> = [];
   disconnectedPlayer: string | null = null;
   disconnectCountdown = 0;
@@ -53,6 +56,51 @@ export class GameComponent implements OnInit, OnDestroy {
 
   showTurnToast = false;
   mobileTab: 'game' | 'players' | 'history' | 'chat' = 'game';
+
+  activeChatCategory = 0;
+
+  // ─── Chat config: add / remove categories or messages here ───────────────
+  readonly chatCategories: { label: string; icon: string; messages: string[] }[] = [
+    {
+      label: 'Estrategia', icon: '🧠',
+      messages: [
+        'Puedo ayudar', 'No puedo hacer mucho', 'Necesito apoyo', 'Voy fuerte',
+        'Voy débil', 'Confíen en mí', 'No gasten mucho', 'Cuidado este turno',
+      ],
+    },
+    {
+      label: 'Ataque', icon: '⚔️',
+      messages: [
+        'Puedo hacer daño', 'Tengo combo', 'Tengo ataque pequeño',
+        'Tengo ataque alto', 'Puedo terminarlo', 'No puedo atacar',
+      ],
+    },
+    {
+      label: 'Defensa', icon: '🛡️',
+      messages: [
+        'Puedo curar', 'Necesitamos curación', 'Guarden recursos', 'Recuperen cartas',
+      ],
+    },
+    {
+      label: 'Prioridad', icon: '📌',
+      messages: [
+        'Ataquen ahora', 'Esperen', 'Usen habilidades', 'No usen habilidades', 'Mejor otro objetivo',
+      ],
+    },
+    {
+      label: 'Joker', icon: '🃏',
+      messages: [
+        '¿Alguien puede hacer mucho daño?', '¿Alguien puede curar?',
+        '¿Estamos en peligro?', '¿Podemos sobrevivir este turno?',
+        '¿Vale la pena atacar fuerte?',
+        'No puedo tomar el turno', 'Yo tomaré el turno',
+      ],
+    },
+    {
+      label: 'Respuesta', icon: '💬',
+      messages: ['Sí', 'No', 'Tal vez'],
+    },
+  ];
 
   private lastPhase = '';
   private lastTurnId = '';
@@ -200,8 +248,16 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.socketService.chatMessage$.pipe(takeUntil(this.destroy$)).subscribe(({ playerName, message }) => {
       const isMe = playerName === this.socketService.playerName;
-      this.chatMessages.push({ playerName: isMe ? 'Tú' : playerName, message, isMe });
+      let color = '';
+      if (isMe) {
+        color = this.playerColorOf(this.socketService.playerId);
+      } else if (this.board) {
+        const player = this.board.players.find(p => p.name === playerName);
+        if (player) color = this.playerColorOf(player.id);
+      }
+      this.chatMessages.push({ playerName: isMe ? 'Tú' : playerName, message, isMe, color });
       if (this.chatMessages.length > 60) this.chatMessages.shift();
+      this.scrollChatToBottom();
     });
 
     this.socketService.requestBoardStatus();
@@ -535,6 +591,15 @@ export class GameComponent implements OnInit, OnDestroy {
 
   sendChat(message: string): void {
     this.socketService.sendChatMessage(message);
+  }
+
+  private scrollChatToBottom(): void {
+    setTimeout(() => {
+      const scrollEl = (el?: ElementRef<HTMLElement>) =>
+        el?.nativeElement.scrollTo({ top: el.nativeElement.scrollHeight, behavior: 'smooth' });
+      scrollEl(this.chatMsgsDesktop);
+      scrollEl(this.chatMsgsMobile);
+    }, 0);
   }
 
   private addToHistory(

@@ -292,20 +292,31 @@
 
     <div class="sidebar-section-label sidebar-section-label--chat">Chat Rápido</div>
     <div class="chat-section">
-      <div class="chat-messages">
-        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe">
-          <span class="chat-name">{{ msg.playerName }}:</span>
+      <div class="chat-messages" #chatMsgsDesktop>
+        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe"
+             [style.border-left-color]="msg.color || null">
+          <span class="chat-name" [style.color]="msg.color || null">{{ msg.playerName }}:</span>
           <span class="chat-text">{{ msg.message }}</span>
         </div>
         <div class="sidebar-empty" *ngIf="chatMessages.length === 0">Sin mensajes aún</div>
       </div>
-      <div class="chat-buttons">
-        <button class="chat-quick-btn" (click)="sendChat('No puedo tomar el turno')">
-          🚫 No puedo tomar el turno
-        </button>
-        <button class="chat-quick-btn" (click)="sendChat('Yo tomaré el turno')">
-          ✅ Yo tomaré el turno
-        </button>
+      <div class="chat-quick-panel">
+        <div class="chat-quick-label">💬 Respuesta rápida</div>
+        <div class="chat-categories">
+          <button class="chat-cat-btn"
+                  *ngFor="let cat of chatCategories; let i = index"
+                  [class.active]="activeChatCategory === i"
+                  (click)="activeChatCategory = i">
+            {{ cat.icon }} {{ cat.label }}
+          </button>
+        </div>
+        <div class="chat-msg-grid">
+          <button class="chat-quick-btn"
+                  *ngFor="let msg of chatCategories[activeChatCategory].messages"
+                  (click)="sendChat(msg)">
+            {{ msg }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -399,20 +410,31 @@
     <!-- Chat tab -->
     <div class="mpanel-tab mpanel-chat-tab" *ngIf="mobileTab === 'chat'">
       <div class="mpanel-header">💬 Chat</div>
-      <div class="mpanel-chat-messages">
-        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe">
-          <span class="chat-name">{{ msg.playerName }}:</span>
+      <div class="mpanel-chat-messages" #chatMsgsMobile>
+        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe"
+             [style.border-left-color]="msg.color || null">
+          <span class="chat-name" [style.color]="msg.color || null">{{ msg.playerName }}:</span>
           <span class="chat-text">{{ msg.message }}</span>
         </div>
         <div class="sidebar-empty" *ngIf="chatMessages.length === 0">Sin mensajes aún</div>
       </div>
-      <div class="chat-buttons mpanel-chat-buttons">
-        <button class="chat-quick-btn" (click)="sendChat('No puedo tomar el turno')">
-          🚫 No puedo tomar el turno
-        </button>
-        <button class="chat-quick-btn" (click)="sendChat('Yo tomaré el turno')">
-          ✅ Yo tomaré el turno
-        </button>
+      <div class="chat-quick-panel mpanel-quick-panel">
+        <div class="chat-quick-label">💬 Respuesta rápida</div>
+        <div class="chat-categories mpanel-chat-categories">
+          <button class="chat-cat-btn"
+                  *ngFor="let cat of chatCategories; let i = index"
+                  [class.active]="activeChatCategory === i"
+                  (click)="activeChatCategory = i">
+            {{ cat.icon }} {{ cat.label }}
+          </button>
+        </div>
+        <div class="chat-msg-grid mpanel-chat-grid">
+          <button class="chat-quick-btn"
+                  *ngFor="let msg of chatCategories[activeChatCategory].messages"
+                  (click)="sendChat(msg)">
+            {{ msg }}
+          </button>
+        </div>
       </div>
     </div>
 
