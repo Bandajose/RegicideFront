@@ -104,6 +104,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private lastPhase = '';
   private lastTurnId = '';
+  private justPassedToDefend = false;
   private playerDataReceived = false;
   private prevHand: Card[] = [];
   private prevTable: Card[] = [];
@@ -194,6 +195,10 @@ export class GameComponent implements OnInit, OnDestroy {
           clearTimeout(this.bossAnnouncementTimeout);
           this.bossAnnouncementTimeout = null;
         }
+      }
+
+      if (prevPhase === 'defend' && board.playerPhase === 'attack') {
+        this.justPassedToDefend = false;
       }
 
       this.lastPhase = board.playerPhase;
@@ -357,6 +362,12 @@ export class GameComponent implements OnInit, OnDestroy {
     return this.board?.playerPhase === 'Joker' && this.hand.length > 0;
   }
 
+  get canReturnToAttack(): boolean {
+    return this.isMyTurn &&
+      this.board?.playerPhase === 'defend' &&
+      this.justPassedToDefend;
+  }
+
   get canDefend(): boolean {
     if (!this.isMyTurn || !this.board || this.board.playerPhase !== 'defend') return false;
 
@@ -474,8 +485,14 @@ export class GameComponent implements OnInit, OnDestroy {
 
   passAttack(): void {
     if (!this.isMyTurn || this.board?.playerPhase !== 'attack') return;
+    this.justPassedToDefend = true;
     this.socketService.playTurn('attack', []);
     this.selectedCards = [];
+  }
+
+  returnToAttack(): void {
+    this.justPassedToDefend = false;
+    this.socketService.returnToAttack();
   }
 
   claimJokerTurn(): void {

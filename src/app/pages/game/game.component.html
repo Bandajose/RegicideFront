@@ -239,9 +239,11 @@
           <span class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</span>
         </div>
         <button class="btn-pass"
-                *ngIf="isMyTurn && board.playerPhase === 'attack'"
-                (click)="passAttack()">
-          ⏭ {{ board.currentBoss.damage === 0 ? 'Pasar turno' : 'Pasar a Modo defensa' }}
+                [class.btn-pass--return]="canReturnToAttack"
+                *ngIf="(isMyTurn && board.playerPhase === 'attack') || canReturnToAttack"
+                (click)="canReturnToAttack ? returnToAttack() : passAttack()">
+          <ng-container *ngIf="canReturnToAttack">↩ Regresar a Ataque</ng-container>
+          <ng-container *ngIf="!canReturnToAttack">⏭ {{ board.currentBoss.damage === 0 ? 'Pasar turno' : 'Pasar a Modo defensa' }}</ng-container>
         </button>
       </div>
 

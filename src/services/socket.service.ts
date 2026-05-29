@@ -167,6 +167,10 @@ export class SocketService {
     });
   }
 
+  returnToAttack(): void {
+    this.socket.emit('returnToAttack', this.currentRoom);
+  }
+
   claimJokerTurn(): void {
     this.socket.emit('claimJokerTurn', {
       roomName: this.currentRoom,
