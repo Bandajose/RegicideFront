@@ -57,6 +57,20 @@ export class GameComponent implements OnInit, OnDestroy {
   showTurnToast = false;
   mobileTab: 'game' | 'players' | 'history' | 'chat' = 'game';
 
+  // Turn timer
+  turnTimerSeconds = 0;
+  turnTimerMax = 0;
+
+  // Boss effect tooltip
+  showEffectTooltip = false;
+
+  readonly bossEffectDetails: Record<string, string> = {
+    '♥': 'Tu ataque ♥ revive cartas del cementerio al mazo. Este jefe bloquea esa habilidad.',
+    '♦': 'Tu ataque ♦ reparte cartas a todos los jugadores. Este jefe bloquea esa habilidad.',
+    '♣': 'Tu ataque ♣ duplica el daño infligido. Este jefe bloquea esa habilidad.',
+    '♠': 'Tu ataque ♠ reduce el daño del jefe en esa cantidad. Este jefe bloquea esa habilidad.',
+  };
+
   activeChatCategory = 0;
 
   // ─── Chat config: add / remove categories or messages here ───────────────
@@ -123,6 +137,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private dealClearTimeout: ReturnType<typeof setTimeout> | null = null;
   private bossHitTimeout: ReturnType<typeof setTimeout> | null = null;
   private bossAnnouncementTimeout: ReturnType<typeof setTimeout> | null = null;
+  private turnTimerInterval: ReturnType<typeof setInterval> | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(private socketService: SocketService, private router: Router) {}
@@ -200,6 +215,9 @@ export class GameComponent implements OnInit, OnDestroy {
       if (prevPhase === 'defend' && board.playerPhase === 'attack') {
         this.justPassedToDefend = false;
       }
+      if (this.prevBossKey !== '' && this.prevBossKey !== currentBossKey) {
+        this.showEffectTooltip = false;
+      }
 
       this.lastPhase = board.playerPhase;
       this.prevBossHealth = board.currentBoss.health;
@@ -265,6 +283,10 @@ export class GameComponent implements OnInit, OnDestroy {
       this.scrollChatToBottom();
     });
 
+    this.socketService.turnTimer$.pipe(takeUntil(this.destroy$)).subscribe(({ seconds, timerMax }) => {
+      this.startTurnCountdown(seconds, timerMax);
+    });
+
     this.socketService.requestBoardStatus();
   }
 
@@ -274,9 +296,24 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
     if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
     if (this.bossAnnouncementTimeout) clearTimeout(this.bossAnnouncementTimeout);
+    if (this.turnTimerInterval) clearInterval(this.turnTimerInterval);
     this.flyingCleanupTimeouts.forEach(t => clearTimeout(t));
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private startTurnCountdown(seconds: number, max = seconds): void {
+    if (this.turnTimerInterval) clearInterval(this.turnTimerInterval);
+    this.turnTimerSeconds = seconds;
+    this.turnTimerMax = max;
+    if (seconds === 0) return;
+    this.turnTimerInterval = setInterval(() => {
+      this.turnTimerSeconds = Math.max(0, this.turnTimerSeconds - 1);
+      if (this.turnTimerSeconds === 0) {
+        clearInterval(this.turnTimerInterval!);
+        this.turnTimerInterval = null;
+      }
+    }, 1000);
   }
 
   private startDisconnectCountdown(): void {
@@ -386,6 +423,33 @@ export class GameComponent implements OnInit, OnDestroy {
       this.hand.reduce((acc, c) => acc + this.cardPoints(c.value), 0) >= bossDamage;
 
     return !handCanCover;
+  }
+
+  get turnPreview(): { label: string; damage: number; extra: string } | null {
+    if (!this.selectedCards.length || !this.board) return null;
+    const phase = this.board.playerPhase;
+    if (phase === 'Joker') return null;
+
+    const total = this.selectedCards.reduce((acc, c) => acc + this.cardPoints(c.value), 0);
+
+    if (phase === 'defend') {
+      return { label: '🛡️', damage: total, extra: `/ ${this.board.currentBoss.damage}` };
+    }
+
+    // Attack phase: apply suit effects
+    const suits = new Set(this.selectedCards.map(c => c.suit));
+    const blocked = this.board.currentBoss.effectBloqued;
+    const bSuit   = this.board.currentBoss.suit;
+
+    const clubActive  = suits.has('♣') && (bSuit !== '♣' || blocked);
+    const spadeActive = suits.has('♠') && (bSuit !== '♠' || blocked);
+
+    const damage = clubActive ? total * 2 : total;
+    const extras: string[] = [];
+    if (clubActive)  extras.push('×2 ♣');
+    if (spadeActive) extras.push(`-${total} atk jefe`);
+
+    return { label: '⚔️', damage, extra: extras.join(' · ') };
   }
 
   get deckStack(): number[] {

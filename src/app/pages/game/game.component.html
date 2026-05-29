@@ -114,6 +114,14 @@
       </ng-container>
     </div>
 
+    <!-- Barra de temporizador de turno -->
+    <div class="turn-timer-bar" *ngIf="turnTimerMax > 0">
+      <div class="timer-fill"
+           [style.width.%]="(turnTimerSeconds / turnTimerMax) * 100"
+           [class.timer-low]="turnTimerSeconds <= 10 && turnTimerSeconds > 0"></div>
+      <span class="timer-label" [class.timer-label-low]="turnTimerSeconds <= 10">{{ turnTimerSeconds }}s</span>
+    </div>
+
     <!-- Botón de reclamar turno (Joker activo, tiene cartas) -->
     <div class="joker-claim-zone" *ngIf="canClaimJokerTurn">
       <button class="btn-claim-joker" (click)="claimJokerTurn()">
@@ -162,6 +170,10 @@
           <div class="boss-effect" *ngIf="board.currentBoss.effects">
             <span class="effect-status">{{ board.currentBoss.effectBloqued ? '✅' : '🚫' }}</span>
             <span>{{ board.currentBoss.effects }}</span>
+            <button class="effect-info-btn" (click)="showEffectTooltip = !showEffectTooltip">?</button>
+            <div class="effect-tooltip" *ngIf="showEffectTooltip">
+              {{ bossEffectDetails[board.currentBoss.suit] }}
+            </div>
           </div>
         </div>
       </div>
@@ -204,10 +216,17 @@
       </div>
     </div>
 
-    <!-- Contador de selección: espacio fijo, nunca desplaza la mesa -->
+    <!-- Contador de selección + preview de daño -->
     <div class="hand-info-row">
       <span class="hand-info" [style.visibility]="selectedCards.length > 0 ? 'visible' : 'hidden'">
-        {{ selectedCards.length }} carta{{ selectedCards.length !== 1 ? 's' : '' }} seleccionada{{ selectedCards.length !== 1 ? 's' : '' }}
+        {{ selectedCards.length }} carta{{ selectedCards.length !== 1 ? 's' : '' }}
+        <ng-container *ngIf="turnPreview">
+          &nbsp;·&nbsp;
+          <span class="preview-badge" [class.preview-defend]="turnPreview.label === '🛡️'">
+            {{ turnPreview.label }} <strong>{{ turnPreview.damage }}</strong>
+            <span class="preview-extra" *ngIf="turnPreview.extra">{{ turnPreview.extra }}</span>
+          </span>
+        </ng-container>
       </span>
     </div>
 

@@ -53,6 +53,7 @@ export class SocketService {
   readonly playerReconnected$: Observable<{ playerName: string }>;
   readonly playerLeft$: Observable<{ playerName: string }>;
   readonly chatMessage$: Observable<{ playerName: string; message: string }>;
+  readonly turnTimer$: Observable<{ playerId: string; seconds: number; timerMax: number; phase: string }>;
 
   constructor() {
     // this.socket = io('http://localhost:3000/'); //dev
@@ -67,6 +68,7 @@ export class SocketService {
     this.playerReconnected$    = this.listen<{ playerName: string }>('playerReconnected');
     this.playerLeft$           = this.listen<{ playerName: string }>('playerLeft');
     this.chatMessage$          = this.listen<{ playerName: string; message: string }>('chatMessage');
+    this.turnTimer$            = this.listen<{ playerId: string; seconds: number; timerMax: number; phase: string }>('turnTimer');
 
     // Al (re)conectar: si hay sala guardada intentar reconectar
     this.socket.on('connect', () => {

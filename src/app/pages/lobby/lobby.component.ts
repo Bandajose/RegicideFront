@@ -96,6 +96,19 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.socketService.setConfig({ ...this.config });
   }
 
+  adjustTurnTime(delta: number) {
+    if (!this.isHost) return;
+    const options = [0, 30, 60, 90];
+    const idx = options.indexOf(this.config.turnTime ?? 0);
+    const newIdx = Math.max(0, Math.min(options.length - 1, idx + delta));
+    this.config.turnTime = options[newIdx];
+    this.socketService.setConfig({ ...this.config });
+  }
+
+  turnTimeLabel(seconds: number): string {
+    return seconds === 0 ? 'Sin límite' : `${seconds}s`;
+  }
+
   toggleReady() {
     this.socketService.toggleReady();
   }

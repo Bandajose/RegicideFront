@@ -49,6 +49,15 @@
           </div>
         </div>
 
+        <div class="config-row">
+          <span class="config-label">⏱ Tiempo por Turno</span>
+          <div class="config-control">
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustTurnTime(-1)">−</button>
+            <span class="ctrl-value">{{ turnTimeLabel(config.turnTime) }}</span>
+            <button class="ctrl-btn" [disabled]="!isHost" (click)="adjustTurnTime(1)">+</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
