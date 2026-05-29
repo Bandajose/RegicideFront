@@ -1033,7 +1033,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 700;
   border-radius: inherit;
   backdrop-filter: blur(4px);
 }
@@ -1176,38 +1176,52 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
 }
 
+// ─── MOBILE NAV / PANEL (hidden on desktop) ────────────────────────────────
+
+.mobile-nav   { display: none; }
+.mobile-panel { display: none; }
+
 // ─── RESPONSIVE MOBILE ─────────────────────────────────────────────────────
 
 @media (max-width: 768px) {
 
-  // Contenedor raíz: columna única, altura dinámica
+  // ── Contenedor raíz: sin zoom, columna única ──────────────────────────────
+
   .game-container {
+    transform: none;
+    width: 100vw;
+    height: 100dvh;
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    padding: 6px;
-    gap: 6px;
-    height: 100vh;
-    height: 100dvh;
+    padding: 6px 6px 0;
+    gap: 4px;
+    overflow: hidden;
+    padding-bottom: 62px;
   }
 
+  // Ocultar sidebars; mostrar nav y panel
   .sidebar-right { display: none; }
+  .mobile-nav    { display: flex; }
+  .mobile-panel  { display: flex; }
 
   // ── Sidebar → barra horizontal superior ───────────────────────────────────
 
   .sidebar {
     flex-direction: row;
     align-items: center;
-    padding: 6px 10px;
+    padding: 5px 8px;
     gap: 6px;
     border-radius: 10px;
     overflow-x: auto;
+    flex-shrink: 0;
   }
 
   .sidebar-section-label { display: none; }
   .sidebar-stats         { display: none; }
+  .btn-leave             { display: none; }
 
   .panel {
-    padding: 5px 10px;
+    padding: 4px 10px;
     font-size: 11px;
     flex-shrink: 0;
   }
@@ -1226,32 +1240,27 @@
     flex-shrink: 0;
   }
 
-  .player-avatar { font-size: 14px; }
-  .player-name   { font-size: 11px; }
-  .player-cards  { font-size: 9px;  }
-
-  .btn-leave {
-    padding: 5px 10px;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
+  .player-name  { font-size: 11px; }
+  .player-cards { font-size: 9px;  }
 
   // ── Main area ─────────────────────────────────────────────────────────────
 
   .main-area {
-    padding: 8px 10px;
-    gap: 4px;
+    padding: 4px 6px;
+    gap: 3px;
     overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
   }
 
   // ── Turn banner ───────────────────────────────────────────────────────────
 
-  .turn-banner  { padding: 5px 12px; }
+  .turn-banner  { padding: 4px 12px; }
   .turn-icon    { font-size: 13px; }
   .turn-text    { font-size: 11px; }
   .phase-badge  { font-size: 9px; padding: 1px 8px; }
 
-  .btn-claim-joker { padding: 8px 28px; font-size: 13px; }
+  .btn-claim-joker { padding: 7px 24px; font-size: 13px; }
 
   // ── Zona central ──────────────────────────────────────────────────────────
 
@@ -1261,57 +1270,57 @@
   }
 
   .boss-card {
-    width: 107px;
-    height: 155px;
+    width: 100px;
+    height: 148px;
   }
 
-  .boss-main-value { font-size: 32px; }
-  .boss-watermark  { font-size: 64px; }
+  .boss-main-value { font-size: 30px; }
+  .boss-watermark  { font-size: 60px; }
   .boss-badge      { font-size: 9px; padding: 2px 8px; }
-  .boss-stats      { padding: 5px 10px; gap: 4px; }
+  .boss-stats      { padding: 4px 10px; gap: 4px; }
   .boss-stat-item  { font-size: 12px; span { font-size: 13px; } }
   .boss-effect     { font-size: 9px; }
 
   .pile-zone { gap: 4px; }
 
   .pile-stack {
-    width: 54px;
-    height: 78px;
-    .card-back { width: 54px; height: 78px; }
+    width: 52px;
+    height: 75px;
+    .card-back { width: 52px; height: 75px; }
   }
 
-  .pile-empty  { width: 54px; height: 78px; }
+  .pile-empty  { width: 52px; height: 75px; }
   .pile-label  { font-size: 8px; letter-spacing: 1px; }
-  .pile-count  { font-size: 12px; }
+  .pile-count  { font-size: 11px; }
 
   // ── Mesa ──────────────────────────────────────────────────────────────────
 
-  .table-panel { padding: 6px 10px; min-height: 34px; }
+  .table-panel { padding: 5px 8px; min-height: 32px; }
   .zone-label  { font-size: 9px; }
 
   .table-card {
-    width: 50px;
-    height: 72px;
-    .suit-center { font-size: 18px; }
+    width: 48px;
+    height: 70px;
+    .suit-center { font-size: 17px; }
     .corner      { font-size: 7px;  }
   }
 
   // ── Hand info ─────────────────────────────────────────────────────────────
 
   .hand-info-row {
-    height: 22px;
-    margin-bottom: 20px;
-    margin-top: auto;
+    height: 20px;
+    margin-bottom: 4px;
+    margin-top: 0;
   }
 
   .hand-info { font-size: 9px; padding: 2px 8px; }
 
-  // ── Contenedor de mano: cartas arriba, botones abajo en fila ──────────────
+  // ── Mano + botones ────────────────────────────────────────────────────────
 
   .hand-container {
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin-top: 0;
   }
 
@@ -1320,7 +1329,7 @@
     width: 100%;
     gap: 4px;
     overflow-x: auto;
-    padding-top: 22px;
+    padding-top: 18px;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
   }
@@ -1328,23 +1337,21 @@
   .btn-defend { order: 1; flex: 1; }
   .btn-attack { order: 2; flex: 1; }
 
-  // ── Cartas de la mano: centradas o scroll horizontal ──────────────────────
-
   .hand-cards {
     flex-wrap: nowrap;
     width: max-content;
     margin: 0 auto;
     gap: 5px;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
   }
 
   .hand-card {
-    width: 62px;
-    height: 90px;
+    width: 60px;
+    height: 88px;
     flex-shrink: 0;
 
-    .suit-center { font-size: 22px; }
+    .suit-center { font-size: 21px; }
     .corner      { font-size: 8px;  }
 
     &.selected {
@@ -1377,4 +1384,142 @@
   }
 
   .toast-icon { font-size: 18px; }
+
+  // ── Bottom nav bar ────────────────────────────────────────────────────────
+
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 62px;
+    background: #1a1a1a;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    z-index: 600;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: color 0.2s, background 0.2s;
+    flex: 1;
+
+    &.active {
+      color: #4fc3f7;
+      background: rgba(79,195,247,0.1);
+    }
+
+    .mnav-icon  { font-size: 19px; line-height: 1; }
+    .mnav-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; margin-top: 1px; }
+  }
+
+  // ── Slide-up mobile panel ─────────────────────────────────────────────────
+
+  .mobile-panel {
+    position: fixed;
+    bottom: 62px;
+    left: 0;
+    right: 0;
+    height: calc(100dvh - 62px);
+    background: #141414;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    z-index: 550;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+
+    &.open {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+
+  .mpanel-tab {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    padding: 0 16px 16px;
+  }
+
+  .mpanel-header {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    padding: 14px 0 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  // Players tab
+  .mpanel-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    flex: 1;
+    margin-bottom: 8px;
+  }
+
+  .mpanel-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+
+  .mpanel-leave {
+    width: 100%;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  // History tab
+  .mpanel-history-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  // Chat tab
+  .mpanel-chat-tab {
+    // inherits mpanel-tab layout
+  }
+
+  .mpanel-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .mpanel-chat-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
 }

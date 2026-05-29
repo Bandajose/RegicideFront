@@ -311,6 +311,113 @@
 
   </div>
 
+  <!-- ── MOBILE NAV ── -->
+  <div class="mobile-nav">
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'game'" (click)="mobileTab = 'game'">
+      <span class="mnav-icon">⚔️</span>
+      <span class="mnav-label">Juego</span>
+    </button>
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'players'" (click)="mobileTab = 'players'">
+      <span class="mnav-icon">👥</span>
+      <span class="mnav-label">Jugadores</span>
+    </button>
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'history'" (click)="mobileTab = 'history'">
+      <span class="mnav-icon">📜</span>
+      <span class="mnav-label">Historial</span>
+    </button>
+    <button class="mobile-nav-btn" [class.active]="mobileTab === 'chat'" (click)="mobileTab = 'chat'">
+      <span class="mnav-icon">💬</span>
+      <span class="mnav-label">Chat</span>
+    </button>
+  </div>
+
+  <!-- ── MOBILE PANEL ── -->
+  <div class="mobile-panel" [class.open]="mobileTab !== 'game'">
+
+    <!-- Jugadores tab -->
+    <div class="mpanel-tab" *ngIf="mobileTab === 'players'">
+      <div class="mpanel-header">👥 Jugadores</div>
+      <div class="mpanel-player-list">
+        <div class="player" *ngFor="let p of board.players" [class.active-turn]="p.id === board.playerTurn">
+          <div class="player-color-dot" [style.background]="playerColorOf(p.id)"></div>
+          <div class="player-info">
+            <span class="player-name">{{ p.id === playerId ? 'Tú' : p.name }}</span>
+            <span class="player-cards">🃏 {{ p.cardCount }} cartas</span>
+          </div>
+          <span class="turn-indicator" *ngIf="p.id === board.playerTurn"></span>
+        </div>
+      </div>
+      <div class="mpanel-stats">
+        <div class="stat-row">
+          <span class="stat-icon">🃏</span>
+          <span class="stat-label">Mazo</span>
+          <strong>{{ board.deck.length }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="stat-icon">🗑️</span>
+          <span class="stat-label">Cementerio</span>
+          <strong>{{ board.grave.length }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="stat-icon">👑</span>
+          <span class="stat-label">Jefes rest.</span>
+          <strong>{{ board.bosses.length }}</strong>
+        </div>
+      </div>
+      <button class="btn btn-leave mpanel-leave" (click)="leaveGame()">🚪 Salir de la partida</button>
+    </div>
+
+    <!-- Historial tab -->
+    <div class="mpanel-tab" *ngIf="mobileTab === 'history'">
+      <div class="mpanel-header">📜 Historial</div>
+      <div class="mpanel-history-list">
+        <div class="history-entry" *ngFor="let entry of historyLog">
+          <div class="history-boss-defeat" *ngIf="entry.isDefeatedBoss">
+            👑 {{ entry.bossDisplay }} ¡Derrotado!
+          </div>
+          <ng-container *ngIf="!entry.isDefeatedBoss">
+            <div class="history-meta" [style.border-left-color]="entry.playerColor">
+              <span class="history-phase">{{ entry.phase === 'attack' ? '⚔️' : '🛡️' }}</span>
+              <strong class="history-player" [style.color]="entry.playerColor">{{ entry.playerName }}</strong>
+              <span class="history-vs">vs {{ entry.bossDisplay }}</span>
+              <span class="history-boss-stats">❤️{{ entry.bossHealth }} ⚔️{{ entry.bossDamage }}</span>
+            </div>
+            <div class="history-cards">
+              <span class="h-chip"
+                    *ngFor="let card of entry.cards"
+                    [class.red]="isRed(card.suit)"
+                    [class.joker]="card.suit === 'Joker'">
+                {{ card.suit === 'Joker' ? '🃏' : card.value + card.suit }}
+              </span>
+            </div>
+          </ng-container>
+        </div>
+        <div class="sidebar-empty" *ngIf="historyLog.length === 0">Sin jugadas aún</div>
+      </div>
+    </div>
+
+    <!-- Chat tab -->
+    <div class="mpanel-tab mpanel-chat-tab" *ngIf="mobileTab === 'chat'">
+      <div class="mpanel-header">💬 Chat</div>
+      <div class="mpanel-chat-messages">
+        <div class="chat-msg" *ngFor="let msg of chatMessages" [class.me]="msg.isMe">
+          <span class="chat-name">{{ msg.playerName }}:</span>
+          <span class="chat-text">{{ msg.message }}</span>
+        </div>
+        <div class="sidebar-empty" *ngIf="chatMessages.length === 0">Sin mensajes aún</div>
+      </div>
+      <div class="chat-buttons mpanel-chat-buttons">
+        <button class="chat-quick-btn" (click)="sendChat('No puedo tomar el turno')">
+          🚫 No puedo tomar el turno
+        </button>
+        <button class="chat-quick-btn" (click)="sendChat('Yo tomaré el turno')">
+          ✅ Yo tomaré el turno
+        </button>
+      </div>
+    </div>
+
+  </div>
+
   <!-- ── ANUNCIO DE JEFE DERROTADO ── -->
   <div class="boss-announcement" *ngIf="bossAnnouncement">
     <div class="boss-ann-defeated">💀 {{ bossAnnouncement.defeated }} derrotado</div>

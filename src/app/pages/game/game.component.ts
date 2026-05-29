@@ -52,6 +52,7 @@ export class GameComponent implements OnInit, OnDestroy {
   newCardIndices: number[] = [];
 
   showTurnToast = false;
+  mobileTab: 'game' | 'players' | 'history' | 'chat' = 'game';
 
   private lastPhase = '';
   private lastTurnId = '';
