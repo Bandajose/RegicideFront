@@ -60,35 +60,35 @@ export class GameComponent implements OnInit, OnDestroy {
   activeChatCategory = 0;
 
   // ─── Chat config: add / remove categories or messages here ───────────────
-  readonly chatCategories: { label: string; icon: string; messages: string[] }[] = [
+  readonly chatCategories: { label: string; icon: string; color: string; messages: string[] }[] = [
     {
-      label: 'Estrategia', icon: '🧠',
+      label: 'Estrategia', icon: '🧠', color: '#4fc3f7',
       messages: [
         'Puedo ayudar', 'No puedo hacer mucho', 'Necesito apoyo', 'Voy fuerte',
         'Voy débil', 'Confíen en mí', 'No gasten mucho', 'Cuidado este turno',
       ],
     },
     {
-      label: 'Ataque', icon: '⚔️',
+      label: 'Ataque', icon: '⚔️', color: '#ef5350',
       messages: [
         'Puedo hacer daño', 'Tengo combo', 'Tengo ataque pequeño',
         'Tengo ataque alto', 'Puedo terminarlo', 'No puedo atacar',
       ],
     },
     {
-      label: 'Defensa', icon: '🛡️',
+      label: 'Defensa', icon: '🛡️', color: '#66bb6a',
       messages: [
         'Puedo curar', 'Necesitamos curación', 'Guarden recursos', 'Recuperen cartas',
       ],
     },
     {
-      label: 'Prioridad', icon: '📌',
+      label: 'Prioridad', icon: '📌', color: '#ffa726',
       messages: [
         'Ataquen ahora', 'Esperen', 'Usen habilidades', 'No usen habilidades', 'Mejor otro objetivo',
       ],
     },
     {
-      label: 'Joker', icon: '🃏',
+      label: 'Joker', icon: '🃏', color: '#ab47bc',
       messages: [
         '¿Alguien puede hacer mucho daño?', '¿Alguien puede curar?',
         '¿Estamos en peligro?', '¿Podemos sobrevivir este turno?',
@@ -97,7 +97,7 @@ export class GameComponent implements OnInit, OnDestroy {
       ],
     },
     {
-      label: 'Respuesta', icon: '💬',
+      label: 'Respuesta', icon: '💬', color: '#26c6da',
       messages: ['Sí', 'No', 'Tal vez'],
     },
   ];
@@ -591,6 +591,12 @@ export class GameComponent implements OnInit, OnDestroy {
 
   sendChat(message: string): void {
     this.socketService.sendChatMessage(message);
+  }
+
+  catStyle(color: string, active: boolean): Record<string, string> {
+    return active
+      ? { color, borderColor: color, backgroundColor: color + '28' }
+      : { color: color + '88', borderColor: color + '44', backgroundColor: color + '0e' };
   }
 
   private scrollChatToBottom(): void {

@@ -306,6 +306,7 @@
           <button class="chat-cat-btn"
                   *ngFor="let cat of chatCategories; let i = index"
                   [class.active]="activeChatCategory === i"
+                  [ngStyle]="catStyle(cat.color, activeChatCategory === i)"
                   (click)="activeChatCategory = i">
             {{ cat.icon }} {{ cat.label }}
           </button>
@@ -424,6 +425,7 @@
           <button class="chat-cat-btn"
                   *ngFor="let cat of chatCategories; let i = index"
                   [class.active]="activeChatCategory === i"
+                  [ngStyle]="catStyle(cat.color, activeChatCategory === i)"
                   (click)="activeChatCategory = i">
             {{ cat.icon }} {{ cat.label }}
           </button>

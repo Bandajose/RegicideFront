@@ -1021,13 +1021,9 @@
 
 .chat-categories {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 4px;
   flex-shrink: 0;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
 }
 
 .chat-cat-btn {
@@ -1035,23 +1031,17 @@
   align-items: center;
   gap: 3px;
   padding: 3px 9px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid;
   border-radius: 20px;
-  color: rgba(255,255,255,0.42);
   font-size: 10px;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 
-  &.active {
-    background: rgba(79,195,247,0.12);
-    border-color: rgba(79,195,247,0.38);
-    color: #4fc3f7;
-  }
+  &.active { font-weight: 700; }
 }
 
 .chat-msg-grid {
