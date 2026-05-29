@@ -478,6 +478,11 @@ export class GameComponent implements OnInit, OnDestroy {
     return suit === '♥' || suit === '♦';
   }
 
+  isEffectBlocked(card: Card): boolean {
+    if (!this.board || card.suit === 'Joker') return false;
+    return card.suit === this.board.currentBoss.suit && !this.board.currentBoss.effectBloqued;
+  }
+
   isSelected(card: Card): boolean {
     return this.selectedCards.some(c => c.value === card.value && c.suit === card.suit);
   }

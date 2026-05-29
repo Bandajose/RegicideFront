@@ -259,6 +259,10 @@
             <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
             <span class="suit-center">{{ card.suit }}</span>
             <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            <div class="effect-blocked-badge" *ngIf="isEffectBlocked(card)">
+              <span class="blocked-icon">🚫</span>
+              <span class="blocked-label">Sin efecto</span>
+            </div>
           </div>
           <span class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</span>
         </div>
