@@ -490,8 +490,77 @@
   margin-top: 2px;
   flex-basis: 100%;
   position: relative;
+  border-radius: 6px;
+  padding: 2px 6px;
+  transition: background 0.4s, color 0.4s;
 
   .effect-status { font-size: 12px; }
+
+  &.effect-is-blocked {
+    background: rgba(105, 240, 174, 0.10);
+    color: rgba(105, 240, 174, 0.75);
+    border: 1px solid rgba(105, 240, 174, 0.18);
+  }
+}
+
+.effect-text-blocked {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.effect-blocked-label {
+  color: #69f0ae;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+// ─── JOKER BLOCK OVERLAY (sobre la carta del jefe) ─────────────────────────
+
+.boss-card.joker-blocked {
+  box-shadow:
+    0 0 0 2px rgba(171, 71, 188, 0.8),
+    0 0 24px rgba(171, 71, 188, 0.55),
+    0 16px 40px rgba(0,0,0,0.7) !important;
+  animation: float 2.4s ease-in-out infinite, joker-blocked-pulse 2s ease-in-out infinite !important;
+}
+
+@keyframes joker-blocked-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(0.78) saturate(0.6); }
+}
+
+.joker-block-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.52);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 5;
+  pointer-events: none;
+  animation: jbo-in 0.35s ease-out;
+
+  .jbo-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+    animation: float 2.4s ease-in-out infinite;
+  }
+
+  .jbo-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ce93d8;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+}
+
+@keyframes jbo-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 // ─── ZONA DE MESA ──────────────────────────────────────────────────────────
@@ -1670,6 +1739,28 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
 }
 
+.joker-blocked-toast {
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #4a148c, #7b1fa2);
+  color: #fff;
+  border: 1px solid rgba(171, 71, 188, 0.45);
+  border-radius: 18px;
+  padding: 14px 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 150;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 36px rgba(123,31,162,0.4);
+  animation: toast-pop 3.2s ease-out forwards;
+}
+
 // ─── MOBILE NAV / PANEL (hidden on desktop) ────────────────────────────────
 
 .mobile-nav   { display: none; }
@@ -1774,6 +1865,9 @@
   .boss-badge      { font-size: 9px; padding: 2px 8px; }
   .boss-stats      { padding: 4px 10px; gap: 4px; }
   .boss-stat-item  { font-size: 12px; span { font-size: 13px; } }
+  .joker-block-overlay .jbo-icon { font-size: 22px; }
+  .joker-block-overlay .jbo-text { font-size: 8px; letter-spacing: 1px; }
+  .joker-blocked-toast { font-size: 13px; padding: 10px 20px; }
   .boss-effect     { font-size: 9px; }
 
   .pile-zone { gap: 4px; }

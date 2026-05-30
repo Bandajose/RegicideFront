@@ -82,6 +82,11 @@ export class GameComponent implements OnInit, OnDestroy {
   // Share link toast
   showCopiedToast = false;
 
+  // Joker-blocked toast
+  jokerBlockedToast = false;
+  private prevEffectBlocked = false;
+  private jokerBlockedToastTimer: ReturnType<typeof setTimeout> | null = null;
+
   // Confetti particles
   confettiParticles: Array<{ x: number; color: string; delay: number; duration: number; size: number; drift: number }> = [];
   private endGameTriggered = false;
@@ -257,6 +262,11 @@ export class GameComponent implements OnInit, OnDestroy {
         this.showEffectTooltip = false;
       }
 
+      // Joker acaba de bloquear el efecto del jefe
+      const effectJustBlocked = !this.prevEffectBlocked && board.currentBoss.effectBloqued;
+      if (effectJustBlocked) this.triggerJokerBlockedToast();
+      this.prevEffectBlocked = board.currentBoss.effectBloqued;
+
       this.lastPhase = board.playerPhase;
       this.prevBossHealth = board.currentBoss.health;
       this.prevBossDamage = board.currentBoss.damage;
@@ -347,6 +357,7 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.dealClearTimeout) clearTimeout(this.dealClearTimeout);
     if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
     if (this.bossAnnouncementTimeout) clearTimeout(this.bossAnnouncementTimeout);
+    if (this.jokerBlockedToastTimer) clearTimeout(this.jokerBlockedToastTimer);
     if (this.turnTimerInterval) clearInterval(this.turnTimerInterval);
     this.flyingCleanupTimeouts.forEach(t => clearTimeout(t));
     this.destroy$.next();
@@ -398,6 +409,15 @@ export class GameComponent implements OnInit, OnDestroy {
       this.showTurnToast = false;
       this.toastTimeout = null;
     }, 2600);
+  }
+
+  private triggerJokerBlockedToast(): void {
+    if (this.jokerBlockedToastTimer) clearTimeout(this.jokerBlockedToastTimer);
+    this.jokerBlockedToast = true;
+    this.jokerBlockedToastTimer = setTimeout(() => {
+      this.jokerBlockedToast = false;
+      this.jokerBlockedToastTimer = null;
+    }, 3200);
   }
 
   // ─── Color por jugador ────────────────────────────────────────────────

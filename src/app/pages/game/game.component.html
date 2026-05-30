@@ -109,6 +109,12 @@
       <span>¡Tu turno, <strong>{{ playerName }}</strong>!</span>
     </div>
 
+    <!-- ── TOAST JOKER BLOQUEÓ EFECTO ── -->
+    <div class="joker-blocked-toast" *ngIf="jokerBlockedToast">
+      <span class="toast-icon">🃏</span>
+      <span>¡Joker bloqueó el efecto del jefe!</span>
+    </div>
+
     <!-- 1) Banner de turno -->
     <div class="turn-banner"
          [class.my-turn]="isMyTurn && board.playerPhase !== 'Joker'"
@@ -184,11 +190,16 @@
              [class.joker]="board.currentBoss.suit === 'Joker'">
           <div class="card boss-card"
                [class.red]="isRed(board.currentBoss.suit)"
-               [class.joker]="board.currentBoss.suit === 'Joker'">
+               [class.joker]="board.currentBoss.suit === 'Joker'"
+               [class.joker-blocked]="board.currentBoss.effectBloqued">
             <span class="boss-watermark">{{ board.currentBoss.suit }}</span>
             <span class="corner tl">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
             <span class="boss-main-value">{{ board.currentBoss.value }}</span>
             <span class="corner br">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+            <div class="joker-block-overlay" *ngIf="board.currentBoss.effectBloqued">
+              <span class="jbo-icon">🃏</span>
+              <span class="jbo-text">SIN EFECTO</span>
+            </div>
           </div>
         </div>
 
@@ -196,9 +207,11 @@
           <span class="boss-stat-item hp">❤️ <span>{{ board.currentBoss.health }}</span></span>
           <span class="boss-stat-sep">·</span>
           <span class="boss-stat-item dmg">⚔️ <span>{{ board.currentBoss.damage }}</span></span>
-          <div class="boss-effect" *ngIf="board.currentBoss.effects">
-            <span class="effect-status">{{ board.currentBoss.effectBloqued ? '✅' : '🚫' }}</span>
-            <span>{{ board.currentBoss.effects }}</span>
+          <div class="boss-effect" *ngIf="board.currentBoss.effects"
+               [class.effect-is-blocked]="board.currentBoss.effectBloqued">
+            <span class="effect-status">{{ board.currentBoss.effectBloqued ? '🃏' : '⚠️' }}</span>
+            <span [class.effect-text-blocked]="board.currentBoss.effectBloqued">{{ board.currentBoss.effects }}</span>
+            <span class="effect-blocked-label" *ngIf="board.currentBoss.effectBloqued">· Bloqueado</span>
             <button class="effect-info-btn" (click)="showEffectTooltip = !showEffectTooltip">?</button>
             <div class="effect-tooltip" *ngIf="showEffectTooltip">
               {{ bossEffectDetails[board.currentBoss.suit] }}
