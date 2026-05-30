@@ -87,6 +87,12 @@ export class GameComponent implements OnInit, OnDestroy {
   private prevEffectBlocked = false;
   private jokerBlockedToastTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // Boss entry / floating damage
+  bossEntering = false;
+  floatingDamageNumbers: Array<{ id: number; value: number; x: number }> = [];
+  private floatingDamageId = 0;
+  private bossEnterTimeout: ReturnType<typeof setTimeout> | null = null;
+
   // Confetti particles
   confettiParticles: Array<{ x: number; color: string; delay: number; duration: number; size: number; drift: number }> = [];
   private endGameTriggered = false;
@@ -211,6 +217,7 @@ export class GameComponent implements OnInit, OnDestroy {
       if (this.prevBossKey === currentBossKey && this.prevBossHealth > 0 && board.currentBoss.health < this.prevBossHealth) {
         this.triggerBossHit();
         this.soundService.bossHit();
+        this.spawnDamageFloat(this.prevBossHealth - board.currentBoss.health);
       }
       // History: only log when a meaningful phase transition completes
       const phaseJustChanged =
@@ -234,6 +241,7 @@ export class GameComponent implements OnInit, OnDestroy {
         this.addBossDefeatedEntry(this.prevBossDisplay);
         if (!board.endGame) {
           this.triggerBossAnnouncement(this.prevBossDisplay, `${board.currentBoss.value}${board.currentBoss.suit}`);
+          this.triggerBossEntry();
         }
         this.frozenTable = this.prevTable;
         const t = setTimeout(() => {
@@ -358,6 +366,7 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.bossHitTimeout) clearTimeout(this.bossHitTimeout);
     if (this.bossAnnouncementTimeout) clearTimeout(this.bossAnnouncementTimeout);
     if (this.jokerBlockedToastTimer) clearTimeout(this.jokerBlockedToastTimer);
+    if (this.bossEnterTimeout) clearTimeout(this.bossEnterTimeout);
     if (this.turnTimerInterval) clearInterval(this.turnTimerInterval);
     this.flyingCleanupTimeouts.forEach(t => clearTimeout(t));
     this.destroy$.next();
@@ -418,6 +427,27 @@ export class GameComponent implements OnInit, OnDestroy {
       this.jokerBlockedToast = false;
       this.jokerBlockedToastTimer = null;
     }, 3200);
+  }
+
+  private spawnDamageFloat(damage: number): void {
+    const id = ++this.floatingDamageId;
+    const x = (Math.random() - 0.5) * 50;
+    this.floatingDamageNumbers.push({ id, value: damage, x });
+    setTimeout(() => {
+      this.floatingDamageNumbers = this.floatingDamageNumbers.filter(f => f.id !== id);
+    }, 1300);
+  }
+
+  private triggerBossEntry(): void {
+    if (this.bossEnterTimeout) clearTimeout(this.bossEnterTimeout);
+    this.bossEntering = false;
+    this.bossEnterTimeout = setTimeout(() => {
+      this.bossEntering = true;
+      this.bossEnterTimeout = setTimeout(() => {
+        this.bossEntering = false;
+        this.bossEnterTimeout = null;
+      }, 1000);
+    }, 1600);
   }
 
   // ─── Color por jugador ────────────────────────────────────────────────
@@ -524,6 +554,20 @@ export class GameComponent implements OnInit, OnDestroy {
     if (spadeActive) extras.push(`-${total} atk jefe`);
 
     return { label: '⚔️', damage, extra: extras.join(' · ') };
+  }
+
+  get turnPreviewEffects(): Array<{ icon: string; text: string; color: string }> {
+    if (!this.selectedCards.length || !this.board || this.board.playerPhase !== 'attack') return [];
+    const total   = this.selectedCards.reduce((acc, c) => acc + this.cardPoints(c.value), 0);
+    const suits   = new Set(this.selectedCards.map(c => c.suit));
+    const blocked = this.board.currentBoss.effectBloqued;
+    const bSuit   = this.board.currentBoss.suit;
+    const out: { icon: string; text: string; color: string }[] = [];
+    if (suits.has('♣') && (bSuit !== '♣' || blocked)) out.push({ icon: '♣', text: `×2 (${total}→${total * 2})`, color: '#66bb6a' });
+    if (suits.has('♠') && (bSuit !== '♠' || blocked)) out.push({ icon: '♠', text: `-${total} atk jefe`,         color: '#90caf9' });
+    if (suits.has('♥') && (bSuit !== '♥' || blocked)) out.push({ icon: '♥', text: 'Revive cartas',               color: '#f48fb1' });
+    if (suits.has('♦') && (bSuit !== '♦' || blocked)) out.push({ icon: '♦', text: 'Reparte cartas',              color: '#ffcc80' });
+    return out;
   }
 
   get deckStack(): number[] {

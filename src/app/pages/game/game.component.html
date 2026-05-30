@@ -180,7 +180,7 @@
       </div>
 
       <!-- Jefe -->
-      <div class="boss-zone" [class.boss-attack]="bossAttacking" [class.boss-hit]="bossHit">
+      <div class="boss-zone" [class.boss-attack]="bossAttacking" [class.boss-hit]="bossHit" [class.boss-entering]="bossEntering">
         <span class="boss-badge">
           {{ board.currentBoss.value === 'K' ? '👑 REY' : board.currentBoss.value === 'Q' ? '👸 REINA' : '⚔️ JOTA' }}
         </span>
@@ -199,6 +199,14 @@
             <div class="joker-block-overlay" *ngIf="board.currentBoss.effectBloqued">
               <span class="jbo-icon">🃏</span>
               <span class="jbo-text">SIN EFECTO</span>
+            </div>
+          </div>
+          <!-- Daño flotante -->
+          <div class="damage-float-container">
+            <div class="damage-float"
+                 *ngFor="let f of floatingDamageNumbers"
+                 [style.--x]="f.x + 'px'">
+              -{{ f.value }}
             </div>
           </div>
         </div>
@@ -262,13 +270,13 @@
     <div class="hand-info-row">
       <span class="hand-info" [style.visibility]="selectedCards.length > 0 ? 'visible' : 'hidden'">
         {{ selectedCards.length }} carta{{ selectedCards.length !== 1 ? 's' : '' }}
-        <ng-container *ngIf="turnPreview">
+        <!-- <ng-container *ngIf="turnPreview">
           &nbsp;·&nbsp;
           <span class="preview-badge" [class.preview-defend]="turnPreview.label === '🛡️'">
             {{ turnPreview.label }} <strong>{{ turnPreview.damage }}</strong>
             <span class="preview-extra" *ngIf="turnPreview.extra">{{ turnPreview.extra }}</span>
           </span>
-        </ng-container>
+        </ng-container> -->
       </span>
     </div>
 
@@ -281,6 +289,28 @@
       </button>
 
       <div class="hand-area">
+
+        <!-- Slot fijo siempre reservado — el preview aparece aquí sin mover nada -->
+        <div class="preview-slot">
+          <div class="turn-preview" *ngIf="turnPreview && isMyTurn && !board.endGame">
+            <div class="tp-row">
+              <span class="tp-phase-label">{{ board.playerPhase === 'defend' ? '🛡️ Defensa' : '⚔️ Daño' }}</span>
+              <span class="tp-damage-val">{{ turnPreview.damage }}</span>
+              <span class="tp-damage-ctx" *ngIf="board.playerPhase === 'defend'">/ {{ board.currentBoss.damage }}</span>
+            </div>
+            <div class="tp-effects" *ngIf="turnPreviewEffects.length">
+              <span class="tp-chip"
+                    *ngFor="let e of turnPreviewEffects"
+                    [style.color]="e.color"
+                    [style.border-color]="e.color">
+                {{ e.icon }} {{ e.text }}
+              </span>
+            </div>
+            <span class="tp-status-ok"   *ngIf="board.playerPhase === 'defend' && turnPreview.damage >= board.currentBoss.damage">✅ Daño completamente cubierto</span>
+            <span class="tp-status-warn" *ngIf="board.playerPhase === 'defend' && turnPreview.damage < board.currentBoss.damage">💔 {{ board.currentBoss.damage - turnPreview.damage }} sin cubrir</span>
+          </div>
+        </div>
+
         <div class="hand-cards">
           <div class="card hand-card"
                *ngFor="let card of hand; let i = index"
@@ -305,6 +335,7 @@
           </div>
           <span class="empty-hand" *ngIf="hand.length === 0">Sin cartas en mano</span>
         </div>
+
         <button class="btn-pass"
                 [class.btn-pass--return]="canReturnToAttack"
                 *ngIf="(isMyTurn && board.playerPhase === 'attack') || canReturnToAttack"
