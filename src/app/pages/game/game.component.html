@@ -192,10 +192,15 @@
                [class.red]="isRed(board.currentBoss.suit)"
                [class.joker]="board.currentBoss.suit === 'Joker'"
                [class.joker-blocked]="board.currentBoss.effectBloqued">
-            <span class="boss-watermark">{{ board.currentBoss.suit }}</span>
-            <span class="corner tl">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
-            <span class="boss-main-value">{{ board.currentBoss.value }}</span>
-            <span class="corner br">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+            <ng-container *ngIf="themeService.cardFaceImage(board.currentBoss.value, board.currentBoss.suit) as bossUrl; else cssBoss">
+              <img [src]="bossUrl" class="card-face-img">
+            </ng-container>
+            <ng-template #cssBoss>
+              <span class="boss-watermark">{{ board.currentBoss.suit }}</span>
+              <span class="corner tl">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+              <span class="boss-main-value">{{ board.currentBoss.value }}</span>
+              <span class="corner br">{{ board.currentBoss.value }}<br>{{ board.currentBoss.suit }}</span>
+            </ng-template>
             <div class="joker-block-overlay" *ngIf="board.currentBoss.effectBloqued">
               <span class="jbo-icon">🃏</span>
               <span class="jbo-text">SIN EFECTO</span>
@@ -255,9 +260,14 @@
                [class.red]="isRed(card.suit)"
                [class.joker]="card.suit === 'Joker'"
                [style.animation-delay.s]="i * 0.2">
-            <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
-            <span class="suit-center">{{ card.suit }}</span>
-            <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            <ng-container *ngIf="themeService.cardFaceImage(card.value, card.suit) as faceUrl; else cssTableCard">
+              <img [src]="faceUrl" class="card-face-img">
+            </ng-container>
+            <ng-template #cssTableCard>
+              <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
+              <span class="suit-center">{{ card.suit }}</span>
+              <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            </ng-template>
           </div>
         </div>
         <div class="table-empty" *ngIf="board.table.length === 0 && frozenTable.length === 0">
@@ -324,9 +334,14 @@
                [class.new-card]="newCardIndices.includes(i)"
                [style.animation-delay.s]="newCardIndices.includes(i) ? (newCardIndices.indexOf(i) * 0.15) : (i * 0.15)"
                (click)="toggleCard(card)">
-            <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
-            <span class="suit-center">{{ card.suit }}</span>
-            <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            <ng-container *ngIf="themeService.cardFaceImage(card.value, card.suit) as faceUrl; else cssHandCard">
+              <img [src]="faceUrl" class="card-face-img">
+            </ng-container>
+            <ng-template #cssHandCard>
+              <span class="corner tl">{{ card.value }}<br>{{ card.suit }}</span>
+              <span class="suit-center">{{ card.suit }}</span>
+              <span class="corner br">{{ card.value }}<br>{{ card.suit }}</span>
+            </ng-template>
             <button class="card-zoom-btn" (click)="openZoom(card, $event)" title="Ver carta">🔍</button>
             <div class="effect-blocked-badge" *ngIf="isEffectBlocked(card)">
               <span class="blocked-icon">🚫</span>
@@ -655,10 +670,15 @@
       <div class="card zoomed-card"
            [class.red]="isRed(zoomedCard.suit)"
            [class.joker]="zoomedCard.suit === 'Joker'">
-        <span class="corner tl">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
-        <span class="suit-center">{{ zoomedCard.suit }}</span>
-        <span class="zoomed-main-value">{{ zoomedCard.value }}</span>
-        <span class="corner br">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
+        <ng-container *ngIf="themeService.cardFaceImage(zoomedCard.value, zoomedCard.suit) as faceUrl; else cssZoomed">
+          <img [src]="faceUrl" class="card-face-img">
+        </ng-container>
+        <ng-template #cssZoomed>
+          <span class="corner tl">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
+          <span class="suit-center">{{ zoomedCard.suit }}</span>
+          <span class="zoomed-main-value">{{ zoomedCard.value }}</span>
+          <span class="corner br">{{ zoomedCard.value }}<br>{{ zoomedCard.suit }}</span>
+        </ng-template>
         <div class="effect-blocked-badge" *ngIf="isEffectBlocked(zoomedCard)">
           <span class="blocked-icon">🚫</span>
           <span class="blocked-label">Sin efecto</span>

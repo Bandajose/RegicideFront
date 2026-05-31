@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from '../../../services/socket.service';
 import { SoundService } from '../../../services/sound.service';
 import { GameHistoryService } from '../../../services/game-history.service';
+import { ThemeService } from '../../../services/theme.service';
 import { Board } from '../../Data/Board';
 import { Card } from '../../Data/Card';
 
@@ -186,6 +187,7 @@ export class GameComponent implements OnInit, OnDestroy {
     private router: Router,
     public soundService: SoundService,
     private historyService: GameHistoryService,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {
