@@ -855,6 +855,16 @@
 
   &.red   { color: #c0392b; }
   &.joker { background: linear-gradient(135deg, #fff9c4, #ffe082); color: #9a6c00; }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.288);
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 .corner {
